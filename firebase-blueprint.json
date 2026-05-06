@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "CorporateClient": {
+      "title": "Corporate Client",
+      "description": "B2B client profile for PT and Enterprise partners",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full legal name of the corporation" },
+        "email": { "type": "string", "format": "email" },
+        "address": { "type": "string" },
+        "status": { "type": "string", "enum": ["Active", "Inactive"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "status", "createdAt"]
+    },
+    "Vehicle": {
+      "title": "Vehicle",
+      "description": "Fleet unit information",
+      "type": "object",
+      "properties": {
+        "plateNumber": { "type": "string", "description": "Unique registration plate" },
+        "model": { "type": "string" },
+        "category": { "type": "string", "enum": ["Sedan", "SUV", "Bus"] },
+        "status": { "type": "string", "enum": ["Available", "Maintenance", "Busy"] },
+        "estimatedCompletionDate": { "type": "string", "format": "date" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["plateNumber", "model", "category", "status", "createdAt"]
+    },
+    "Driver": {
+      "title": "Driver",
+      "description": "Information about Bluebird drivers",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string", "enum": ["Available", "Busy", "Off"] },
+        "assignedVehicleId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone", "status", "createdAt"]
+    },
+    "Order": {
+      "title": "B2B Order",
+      "description": "Connected order linking client, vehicle, and driver",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string" },
+        "vehicleId": { "type": "string" },
+        "driverId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Draft", "Active", "Completed"] },
+        "pickupDate": { "type": "string", "format": "date" },
+        "returnDate": { "type": "string", "format": "date" },
+        "price": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["Outstanding", "Paid"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["clientId", "vehicleId", "driverId", "status", "pickupDate", "returnDate", "price", "paymentStatus", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/clients/{clientId}": {
+      "schema": "CorporateClient",
+      "description": "Collection of corporate clients"
+    },
+    "/vehicles/{vehicleId}": {
+      "schema": "Vehicle",
+      "description": "Collection of fleet vehicles"
+    },
+    "/drivers/{driverId}": {
+      "schema": "Driver",
+      "description": "Collection of drivers"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Collection of B2B orders"
+    }
+  }
+}
