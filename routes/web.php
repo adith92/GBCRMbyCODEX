@@ -10,6 +10,16 @@ use App\Livewire\Bookings\Create as BookingCreate;
 use App\Livewire\Bookings\Edit as BookingEdit;
 use App\Livewire\Bookings\Index as BookingIndex;
 use App\Livewire\Bookings\Show as BookingShow;
+use App\Livewire\Finance\Dashboard as FinanceDashboard;
+use App\Livewire\Finance\EVouchers\Create as EVoucherCreate;
+use App\Livewire\Finance\EVouchers\Index as EVoucherIndex;
+use App\Livewire\Finance\EVouchers\Show as EVoucherShow;
+use App\Livewire\Finance\Invoices\Index as InvoiceIndex;
+use App\Livewire\Finance\Invoices\Show as InvoiceShow;
+use App\Livewire\Finance\PurchaseOrders\Create as PurchaseOrderCreate;
+use App\Livewire\Finance\PurchaseOrders\Edit as PurchaseOrderEdit;
+use App\Livewire\Finance\PurchaseOrders\Index as PurchaseOrderIndex;
+use App\Livewire\Finance\PurchaseOrders\Show as PurchaseOrderShow;
 use App\Livewire\Pool\AssignBooking;
 use App\Livewire\Pool\Queue as PoolQueue;
 use Illuminate\Support\Facades\Route;
@@ -92,10 +102,29 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:pool.assign-driver')
         ->name('pool.assign');
 
-    Route::view('/finance', 'module-placeholder', [
-        'header' => 'Finance Module',
-        'message' => 'Checkpoint placeholder. PO, invoice, payment, and e-voucher flows start in Phase 2.2.',
-    ])->middleware('permission:purchase-orders.view|invoices.view|payments.view|evouchers.view')->name('finance.index');
+    Route::prefix('/finance')->name('finance.')->group(function (): void {
+        Route::get('/', FinanceDashboard::class)
+            ->middleware('permission:purchase-orders.view|invoices.view|payments.view|evouchers.view')
+            ->name('index');
+
+        Route::prefix('/purchase-orders')->name('purchase-orders.')->group(function (): void {
+            Route::get('/', PurchaseOrderIndex::class)->middleware('permission:purchase-orders.view')->name('index');
+            Route::get('/create', PurchaseOrderCreate::class)->middleware('permission:purchase-orders.create')->name('create');
+            Route::get('/{purchaseOrder}', PurchaseOrderShow::class)->middleware('permission:purchase-orders.view')->name('show');
+            Route::get('/{purchaseOrder}/edit', PurchaseOrderEdit::class)->middleware('permission:purchase-orders.create')->name('edit');
+        });
+
+        Route::prefix('/invoices')->name('invoices.')->group(function (): void {
+            Route::get('/', InvoiceIndex::class)->middleware('permission:invoices.view')->name('index');
+            Route::get('/{invoice}', InvoiceShow::class)->middleware('permission:invoices.view')->name('show');
+        });
+
+        Route::prefix('/e-vouchers')->name('e-vouchers.')->group(function (): void {
+            Route::get('/', EVoucherIndex::class)->middleware('permission:evouchers.view')->name('index');
+            Route::get('/create', EVoucherCreate::class)->middleware('permission:evouchers.create')->name('create');
+            Route::get('/{eVoucher}', EVoucherShow::class)->middleware('permission:evouchers.view')->name('show');
+        });
+    });
 
     Route::view('/maintenance', 'module-placeholder', [
         'header' => 'Maintenance Module',

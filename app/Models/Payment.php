@@ -12,6 +12,7 @@ class Payment extends Model
 
     protected $fillable = [
         'invoice_id',
+        'e_voucher_id',
         'payment_number',
         'paid_at',
         'amount',
@@ -37,5 +38,10 @@ class Payment extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function eVoucher(): BelongsTo
+    {
+        return $this->belongsTo(EVoucher::class, 'e_voucher_id');
     }
 }

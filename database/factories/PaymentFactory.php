@@ -18,6 +18,7 @@ class PaymentFactory extends Factory
     {
         return [
             'invoice_id' => Invoice::factory(),
+            'e_voucher_id' => null,
             'payment_number' => strtoupper(fake()->unique()->bothify('PAY-########')),
             'paid_at' => fake()->date(),
             'amount' => fake()->randomFloat(2, 100000, 10000000),
