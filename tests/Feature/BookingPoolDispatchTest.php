@@ -134,13 +134,16 @@ class BookingPoolDispatchTest extends TestCase
             ->set('vehicle_id', $vehicle->id)
             ->set('driver_id', $driver->id)
             ->call('save')
-            ->assertHasErrors(['driver_id']);
+            ->assertHasErrors(['vehicle_id']);
     }
 
     public function test_cannot_double_assign_driver_on_overlapping_booking(): void
     {
         [$user, $booking, $vehicle, $driver] = $this->assignFixture();
-        $otherVehicle = Vehicle::query()->where('id', '!=', $vehicle->id)->where('status', 'available')->firstOrFail();
+        $otherVehicle = Vehicle::factory()->create([
+            'pool_id' => $booking->pool_id,
+            'status' => 'available',
+        ]);
 
         Booking::query()->create([
             'booking_number' => 'BK-209901-9999',
@@ -158,7 +161,7 @@ class BookingPoolDispatchTest extends TestCase
             ->set('vehicle_id', $vehicle->id)
             ->set('driver_id', $driver->id)
             ->call('save')
-            ->assertHasErrors(['vehicle_id']);
+            ->assertHasErrors(['driver_id']);
     }
 
     public function test_confirm_assigned_booking_changes_status_to_confirmed(): void
@@ -221,20 +224,31 @@ class BookingPoolDispatchTest extends TestCase
     private function assignFixture(): array
     {
         $user = User::query()->where('email', 'headpool@blueerp.test')->firstOrFail();
-        $pool = Pool::query()->firstOrFail();
-        $booking = Booking::query()->where('status', 'pending')->firstOrFail();
+        $pool = Pool::factory()->create(['status' => 'active']);
+        $client = Client::factory()->create(['status' => 'active']);
 
-        $booking->update([
+        $booking = Booking::factory()->create([
+            'booking_number' => 'BK-209901-0001',
+            'client_id' => $client->id,
+            'requested_by' => $user->id,
             'pool_id' => $pool->id,
             'vehicle_id' => null,
             'driver_id' => null,
             'start_datetime' => now()->addHours(4),
             'end_datetime' => now()->addHours(8),
+            'status' => 'pending',
         ]);
 
-        $vehicle = Vehicle::query()->where('pool_id', $pool->id)->where('status', 'available')->firstOrFail();
-        $driver = Driver::query()->where('pool_id', $pool->id)->where('status', 'active')->firstOrFail();
+        $vehicle = Vehicle::factory()->create([
+            'pool_id' => $pool->id,
+            'status' => 'available',
+        ]);
 
-        return [$user, $booking->fresh(), $vehicle, $driver];
+        $driver = Driver::factory()->create([
+            'pool_id' => $pool->id,
+            'status' => 'active',
+        ]);
+
+        return [$user, $booking, $vehicle, $driver];
     }
 }

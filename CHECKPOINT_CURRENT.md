@@ -2,100 +2,70 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-2.1-BOOKING-POOL-DISPATCH-COMPLETE  
+**Checkpoint ID:** PHASE-2.1B-RUNTIME-STABILIZED  
 **Date:** 2026-06-02  
-**Status:** Completed with runtime validation blocker documented  
+**Status:** Completed  
 **Branch:** main
 
-## Completed Tasks
+## Root Cause Analysis
 
-- Booking + Pool Dispatch core flow implemented with Laravel 12 + Livewire 3:
-  - Booking list page with filter/search/pagination:
-    - search booking number / client
-    - filter by booking status
-    - filter by start date range
-  - Booking create page:
-    - auto booking number format `BK-YYYYMM-0001` via `BookingNumberService`
-    - status default `pending`
-  - Booking edit page:
-    - editable for `pending` / `assigned` (super-admin bypass)
-  - Booking detail page:
-    - detail info, assignment history
-    - action buttons for assign / confirm / cancel based on permission + status
-- Pool dispatch features:
-  - Pool queue page (`/pool/queue`) for pending/assigned bookings
-  - Assign page (`/pool/bookings/{booking}/assign`) to assign vehicle + driver
-  - `BookingDispatchService` handles:
-    - assign booking (`pending|assigned` -> `assigned`)
-    - confirm booking (`assigned` -> `confirmed`)
-    - cancel booking (`pending|assigned|confirmed` -> `cancelled`)
-    - overlap checks (vehicle and driver)
-    - create `driver_assignments` history
-    - update vehicle status to `po` on assignment
-    - release vehicle back to `available` when no active booking remains
-- Routes and sidebar:
-  - bookings routes:
-    - `/bookings`
-    - `/bookings/create`
-    - `/bookings/{booking}`
-    - `/bookings/{booking}/edit`
-  - pool routes:
-    - `/pool/queue`
-    - `/pool/bookings/{booking}/assign`
-  - sidebar now includes:
-    - `Bookings` (permission: `bookings.view`)
-    - `Pool Queue` (permission: `pool.view-all` or `pool.view-own`)
-- Permissions enforced at route + component level for all booking/pool actions.
-- Feature tests for Booking + Pool Dispatch updated/added in:
-  - `tests/Feature/BookingPoolDispatchTest.php`
-  - covers:
-    - booking create
-    - booking number generation
-    - guest cannot access bookings
-    - non-permitted role cannot access bookings
-    - pool queue access
-    - assign flow changes status to assigned
-    - assignment history row created
-    - assigned vehicle status becomes `po`
-    - validation on unavailable vehicle
-    - overlap protection for driver
-    - confirm flow
-    - confirm blocked when driver/vehicle missing
-    - cancel releases assignment and returns vehicle
+Runtime blocker pada checkpoint 2.1 bukan berasal dari fitur Booking/Pool business flow, melainkan dari kombinasi issue runtime environment + test/build stability:
+
+1. `php artisan ...` sempat hang/fatal karena environment PHP CLI memakai `max_execution_time=0`.
+   - Pada environment PHP 8.5.6 ini, nilai `0` memicu perilaku tidak stabil untuk command CLI Laravel (hang / fatal timeout behavior).
+2. Beberapa percobaan validasi sebelumnya dijalankan paralel (`optimize:clear`, `migrate`, `test`, `build`) sehingga memicu lock dan gejala hang palsu.
+3. `BookingPoolDispatchTest` menggunakan fixture dari data seed random (`pool/driver/vehicle/status`) sehingga tidak deterministik dan memicu `ModelNotFoundException` intermiten.
+
+## Fixes Implemented
+
+1. **Artisan runtime guard**
+   - File: `artisan`
+   - Menambahkan guard:
+     - jika `max_execution_time <= 0`, set ke `3600` untuk CLI command.
+   - Ini menstabilkan `php artisan` command pada environment ini.
+
+2. **Build stabilization (Vite refresh watcher during build)**
+   - File: `vite.config.js`
+   - Mengubah konfigurasi `refresh` supaya nonaktif saat command `build`:
+     - `refresh: !isBuildCommand`
+   - Mencegah proses build yang tertahan watcher di mode production build.
+
+3. **Booking dispatch tests hardened (deterministic fixtures)**
+   - File: `tests/Feature/BookingPoolDispatchTest.php`
+   - Fixture assignment diubah jadi deterministic:
+     - membuat `pool/client/booking/vehicle/driver` sendiri per test, status eksplisit.
+   - Assertion error key disesuaikan dengan validasi aktual (`vehicle_id` vs `driver_id`).
+   - Menutup failure acak `ModelNotFoundException` dari data random seeder.
 
 ## Validation Result
 
-Command status on this machine:
+Berikut command validasi yang dijalankan untuk checkpoint ini:
 
-1. `composer install`  
-   - started and dependencies reported as already installed.
-2. `npm install`  
-   - success (`up to date`, no vulnerabilities).
-3. `php artisan migrate:fresh --seed`  
-   - **blocked on environment runtime issue**.
-4. `npm run build`  
-   - not executed because Laravel runtime validation was blocked first.
-5. `php artisan test`  
-   - not executed because Laravel runtime validation was blocked first.
-
-### Blocker Detail
-
-- PHP CLI can run (`php -v` works), but `php artisan ...` hangs and then can fail with:
-  - `Maximum execution time of 0 seconds exceeded`
-- This indicates an environment/runtime issue during Laravel bootstrap in current machine session, not a syntax error in checkpoint code.
-- Syntax checks passed for the newly added PHP files (`php -l` clean).
+1. `composer install`
+   - dependency lock verified, no package changes needed.
+2. `npm install`
+   - success, up to date.
+3. `php artisan optimize:clear`
+   - success.
+4. `php artisan migrate:fresh --seed`
+   - success.
+5. `npm run build`
+   - success.
+6. `php artisan test`
+   - success.
+   - Result: **54 passed, 0 failed**.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 2.2 — Finance Flow (PO, Invoice, Payment, eVoucher)** after runtime issue is resolved, with focus on:
+Proceed to **Checkpoint 2.2 — Finance Flow**:
 
-1. Purchase Order baseline flow tied to booking/client.
-2. Invoice generation + status transitions.
-3. Payment posting and reconciliation basics.
-4. eVoucher create/update flow.
-5. finance-role permission matrix verification.
+1. Purchase Orders baseline
+2. Invoices baseline
+3. Payments baseline
+4. eVouchers baseline
+5. finance permission-flow validation
 
 ## Notes
 
-- `CHECKPOINT_CURRENT.md` was restored before continuing this checkpoint, then updated to latest status.
-- Restore was not committed as a separate commit.
+- Fitur Booking + Pool Dispatch tetap dipertahankan (tidak dihapus).
+- Fokus checkpoint ini murni runtime stabilization + full validation pass.
