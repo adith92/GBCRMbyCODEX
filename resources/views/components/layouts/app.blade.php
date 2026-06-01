@@ -49,7 +49,7 @@
                         <li>
                             <a
                                 href="{{ route($item['route']) }}"
-                                class="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 {{ request()->routeIs($item['route']) ? 'bg-slate-100 text-slate-900' : '' }}"
+                                class="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 {{ request()->routeIs($item['route']) || request()->routeIs($item['route'].'.*') ? 'bg-slate-100 text-slate-900' : '' }}"
                             >
                                 {{ $item['label'] }}
                             </a>
@@ -80,7 +80,13 @@
             </div>
         </header>
 
-        <main class="flex-1 p-6">
+        <main class="flex-1 space-y-4 p-6">
+            @if (session('success'))
+                <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             {{ $slot }}
         </main>
     </div>

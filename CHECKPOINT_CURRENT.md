@@ -2,7 +2,7 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-1.0-CORE-DB-SCHEMA-COMPLETE  
+**Checkpoint ID:** PHASE-1.1-FLEET-DRIVER-CLIENT-CRUD-COMPLETE  
 **Date:** 2026-06-02  
 **Status:** Completed  
 **Branch:** main  
@@ -10,39 +10,49 @@
 
 ## Completed Tasks
 
-- Core database schema foundation implemented for 15 domain entities:
-  - `clients`
-  - `client_contacts`
-  - `meeting_logs`
-  - `pools`
-  - `vehicles`
-  - `drivers`
-  - `bookings`
-  - `driver_assignments`
-  - `purchase_orders`
-  - `invoices`
-  - `payments`
-  - `e_vouchers`
-  - `maintenance_logs`
-  - `driver_attendances`
-  - `report_snapshots`
-- Foreign keys and on-delete/on-update rules added with business-safe defaults (`cascade`, `restrict`, `nullOnDelete`) according to entity context.
-- Eloquent models completed with fillable fields, casts, and relationships.
-- Core factories added for all new entities.
-- Seeders updated:
-  - RBAC seeder kept intact.
-  - `CoreDataSeeder` added with minimum sample data:
-    - 3 pools
-    - 10 clients
-    - 15 vehicles
-    - 10 drivers
-  - `DatabaseSeeder` now calls RBAC + core data seeding.
-- Relationship-focused automated tests added:
-  - migrate fresh + seed success
-  - client has contacts relationship
-  - vehicle belongs to pool
-  - booking links client/vehicle/driver
-  - driver assignment creation
+- Fleet / Vehicles basic CRUD completed:
+  - index, create, edit, show, delete
+  - filter by status and pool
+  - search by plate number, brand, model
+  - status badges (`available`, `po`, `maintenance`, `hold`)
+  - permissions enforced: `vehicles.view`, `vehicles.create`, `vehicles.update`, `vehicles.delete`
+- Drivers basic CRUD completed:
+  - index, create, edit, show, delete
+  - filter by status and pool
+  - search by name, phone, employee code
+  - license expired indicator in list/detail
+  - permissions enforced: `drivers.view`, `drivers.create`, `drivers.update`, `drivers.delete`
+- Clients + Contacts basic CRUD completed:
+  - client index, create, edit, show, delete
+  - filter by tier and status
+  - search by name and legal name
+  - client contacts displayed on detail
+  - add/edit/delete contact from client detail
+  - permissions enforced: `clients.view`, `clients.create`, `clients.update`, `clients.delete`
+- Meeting logs basic on client detail:
+  - latest meeting logs list
+  - add meeting log form
+  - permissions enforced: `meeting-logs.view`, `meeting-logs.create`
+- Route groups organized and active:
+  - `/crm/clients`
+  - `/fleet/vehicles`
+  - `/drivers`
+- Sidebar active for:
+  - CRM
+  - Fleet
+  - Drivers
+- UX minimum delivered:
+  - empty states
+  - success flash messages
+  - validation errors
+  - delete confirmation prompt
+  - pagination
+- Automated tests added for checkpoint scope:
+  - no-permission user cannot access vehicles
+  - user with `vehicles.view` can access vehicles
+  - vehicle create validation works
+  - create client with contact works
+  - create driver works
 
 ## Validation Result
 
@@ -56,19 +66,19 @@ Executed successfully:
 
 Result: all tests passing.
 
-## Next Checkpoint Recommendation
+## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 1.1 — Fleet + Driver Core CRUD Shell**:
+Proceed to **Checkpoint 2.1 — Booking + Pool Dispatch**:
 
-1. Fleet and Driver controllers/resources
-2. Route + permission guards for fleet/driver CRUD endpoints
-3. Vehicle status transition guard foundation
-4. Basic list/create/edit pages (Livewire/Blade shell)
-5. Commit target: `checkpoint: phase-1 fleet driver core`
+1. booking create/list/detail flow
+2. pool queue view
+3. assign driver + vehicle to booking
+4. assignment state transition (`pending` → `assigned` → `confirmed`)
+5. permission guards for booking/pool actions
 
 ## Do Not Do Yet
 
 - Do not migrate stack to Next.js/Supabase.
-- Do not jump to UI polish (Google Stitch integration) before core CRUD baseline is stable.
+- Do not apply final Google Stitch visual overhaul yet.
 - Do not expose HR module in non-super-admin surface.
 - Do not commit production secrets.
