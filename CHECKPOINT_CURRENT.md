@@ -2,51 +2,56 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** RESET-001  
+**Checkpoint ID:** PHASE-0.1-SCAFFOLD-COMPLETE  
 **Date:** 2026-06-02  
-**Status:** Repository reset to BlueERP planning pack  
+**Status:** Completed  
 **Branch:** main  
-**Backup Branch:** backup/pre-blueerp-reset-20260602  
+**Backup Branch:** backup/pre-blueerp-reset-20260602
 
 ## What Changed
 
-- Old AI Studio app content replaced with BlueERP planning checkpoint.
-- MVP stack decision locked to Laravel 12 + Livewire 3 + MySQL + Spatie.
-- Added masterplan, PRD, agent instructions, and Codex prompt.
-- Ready for Codex to start Phase 0 scaffold.
+- Laravel 12 foundation initialized in repository root.
+- Livewire 3 installed and published (`config/livewire.php`, frontend assets).
+- Tailwind build pipeline confirmed via Vite.
+- Spatie Laravel Permission installed and migration/config published.
+- `.env.example` hardened with safe local placeholders (no secrets).
+- Base dashboard shell created with:
+  - topbar
+  - sidebar
+  - content wrapper
+  - role-aware sidebar placeholder
+- Dashboard route now points to initial BlueERP dashboard page.
+- User model updated with `HasRoles` trait.
+- Seeder updated with baseline role set + super-admin seed user.
 
 ## Current Decision
 
 Use **Laravel 12 + Livewire 3 + MySQL + Tailwind + Spatie Permission** for MVP demo.
 
-Reason: fastest, lowest-risk path for enterprise dashboard + RBAC + CRUD-heavy workflow.
+## Validation Result
+
+Executed successfully:
+
+1. `composer install`
+2. `npm install`
+3. `php artisan key:generate`
+4. `php artisan migrate:fresh --seed`
+5. `npm run build`
+6. `php artisan test`
 
 ## Next Task for Codex
 
-Start **Checkpoint 0.1 — Scaffold Laravel Foundation**:
+Start **Checkpoint 0.2 — RBAC Foundation**:
 
-1. Initialize Laravel 12 project in repository root.
-2. Install Livewire 3.
-3. Setup Tailwind.
-4. Install Spatie Laravel Permission.
-5. Create `.env.example`.
-6. Create base layout, dashboard shell, and role-aware sidebar placeholder.
-7. Commit: `checkpoint: phase-0 scaffold laravel foundation`
+1. Define permission matrix by module.
+2. Add route middleware guards.
+3. Implement role-based sidebar visibility (real role checks by access scope).
+4. Seed demo users per role.
+5. Commit: `checkpoint: phase-0 auth rbac foundation`
 
 ## Do Not Do Yet
 
-- Do not implement all modules before scaffold validation.
+- Do not jump to full business modules before RBAC checkpoint is validated.
 - Do not migrate to Next.js/Supabase.
 - Do not expose HR in main dashboard.
-- Do not create fake production credentials.
-
-## Validation Required
-
-```bash
-composer install
-npm install
-php artisan key:generate
-php artisan migrate:fresh --seed
-npm run build
-php artisan test
-```
+- Do not commit real credentials/secrets.
