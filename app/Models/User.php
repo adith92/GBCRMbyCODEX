@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -14,37 +14,57 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function meetingLogs(): HasMany
+    {
+        return $this->hasMany(MeetingLog::class);
+    }
+
+    public function requestedBookings(): HasMany
+    {
+        return $this->hasMany(Booking::class, 'requested_by');
+    }
+
+    public function assignedDriverAssignments(): HasMany
+    {
+        return $this->hasMany(DriverAssignment::class, 'assigned_by');
+    }
+
+    public function approvedPurchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class, 'approved_by');
+    }
+
+    public function createdPayments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'created_by');
+    }
+
+    public function reportedMaintenanceLogs(): HasMany
+    {
+        return $this->hasMany(MaintenanceLog::class, 'reported_by');
+    }
+
+    public function reportSnapshots(): HasMany
+    {
+        return $this->hasMany(ReportSnapshot::class, 'created_by');
     }
 }
