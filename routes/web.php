@@ -6,6 +6,12 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\MeetingLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VehicleController;
+use App\Livewire\Bookings\Create as BookingCreate;
+use App\Livewire\Bookings\Edit as BookingEdit;
+use App\Livewire\Bookings\Index as BookingIndex;
+use App\Livewire\Bookings\Show as BookingShow;
+use App\Livewire\Pool\AssignBooking;
+use App\Livewire\Pool\Queue as PoolQueue;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -63,15 +69,28 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:drivers.update', ['only' => ['edit', 'update']])
         ->middleware('permission:drivers.delete', ['only' => ['destroy']]);
 
-    Route::view('/pool', 'module-placeholder', [
-        'header' => 'Pool Module',
-        'message' => 'Checkpoint placeholder. Pool assignment flow starts in Phase 2.1.',
-    ])->middleware('permission:pool.view-all|pool.view-own')->name('pool.index');
+    Route::get('/bookings', BookingIndex::class)
+        ->middleware('permission:bookings.view')
+        ->name('bookings.index');
+    Route::get('/bookings/create', BookingCreate::class)
+        ->middleware('permission:bookings.create')
+        ->name('bookings.create');
+    Route::get('/bookings/{booking}', BookingShow::class)
+        ->middleware('permission:bookings.view')
+        ->name('bookings.show');
+    Route::get('/bookings/{booking}/edit', BookingEdit::class)
+        ->middleware('permission:bookings.update')
+        ->name('bookings.edit');
 
-    Route::view('/bookings', 'module-placeholder', [
-        'header' => 'Booking Module',
-        'message' => 'Checkpoint placeholder. Booking flow starts in Phase 2.1.',
-    ])->middleware('permission:bookings.view')->name('bookings.index');
+    Route::get('/pool', fn () => redirect()->route('pool.queue'))
+        ->middleware('permission:pool.view-all|pool.view-own')
+        ->name('pool.index');
+    Route::get('/pool/queue', PoolQueue::class)
+        ->middleware('permission:pool.view-all|pool.view-own')
+        ->name('pool.queue');
+    Route::get('/pool/bookings/{booking}/assign', AssignBooking::class)
+        ->middleware('permission:pool.assign-driver')
+        ->name('pool.assign');
 
     Route::view('/finance', 'module-placeholder', [
         'header' => 'Finance Module',

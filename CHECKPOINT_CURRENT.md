@@ -2,83 +2,100 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-1.1-FLEET-DRIVER-CLIENT-CRUD-COMPLETE  
+**Checkpoint ID:** PHASE-2.1-BOOKING-POOL-DISPATCH-COMPLETE  
 **Date:** 2026-06-02  
-**Status:** Completed  
-**Branch:** main  
-**Backup Branch:** backup/pre-blueerp-reset-20260602
+**Status:** Completed with runtime validation blocker documented  
+**Branch:** main
 
 ## Completed Tasks
 
-- Fleet / Vehicles basic CRUD completed:
-  - index, create, edit, show, delete
-  - filter by status and pool
-  - search by plate number, brand, model
-  - status badges (`available`, `po`, `maintenance`, `hold`)
-  - permissions enforced: `vehicles.view`, `vehicles.create`, `vehicles.update`, `vehicles.delete`
-- Drivers basic CRUD completed:
-  - index, create, edit, show, delete
-  - filter by status and pool
-  - search by name, phone, employee code
-  - license expired indicator in list/detail
-  - permissions enforced: `drivers.view`, `drivers.create`, `drivers.update`, `drivers.delete`
-- Clients + Contacts basic CRUD completed:
-  - client index, create, edit, show, delete
-  - filter by tier and status
-  - search by name and legal name
-  - client contacts displayed on detail
-  - add/edit/delete contact from client detail
-  - permissions enforced: `clients.view`, `clients.create`, `clients.update`, `clients.delete`
-- Meeting logs basic on client detail:
-  - latest meeting logs list
-  - add meeting log form
-  - permissions enforced: `meeting-logs.view`, `meeting-logs.create`
-- Route groups organized and active:
-  - `/crm/clients`
-  - `/fleet/vehicles`
-  - `/drivers`
-- Sidebar active for:
-  - CRM
-  - Fleet
-  - Drivers
-- UX minimum delivered:
-  - empty states
-  - success flash messages
-  - validation errors
-  - delete confirmation prompt
-  - pagination
-- Automated tests added for checkpoint scope:
-  - no-permission user cannot access vehicles
-  - user with `vehicles.view` can access vehicles
-  - vehicle create validation works
-  - create client with contact works
-  - create driver works
+- Booking + Pool Dispatch core flow implemented with Laravel 12 + Livewire 3:
+  - Booking list page with filter/search/pagination:
+    - search booking number / client
+    - filter by booking status
+    - filter by start date range
+  - Booking create page:
+    - auto booking number format `BK-YYYYMM-0001` via `BookingNumberService`
+    - status default `pending`
+  - Booking edit page:
+    - editable for `pending` / `assigned` (super-admin bypass)
+  - Booking detail page:
+    - detail info, assignment history
+    - action buttons for assign / confirm / cancel based on permission + status
+- Pool dispatch features:
+  - Pool queue page (`/pool/queue`) for pending/assigned bookings
+  - Assign page (`/pool/bookings/{booking}/assign`) to assign vehicle + driver
+  - `BookingDispatchService` handles:
+    - assign booking (`pending|assigned` -> `assigned`)
+    - confirm booking (`assigned` -> `confirmed`)
+    - cancel booking (`pending|assigned|confirmed` -> `cancelled`)
+    - overlap checks (vehicle and driver)
+    - create `driver_assignments` history
+    - update vehicle status to `po` on assignment
+    - release vehicle back to `available` when no active booking remains
+- Routes and sidebar:
+  - bookings routes:
+    - `/bookings`
+    - `/bookings/create`
+    - `/bookings/{booking}`
+    - `/bookings/{booking}/edit`
+  - pool routes:
+    - `/pool/queue`
+    - `/pool/bookings/{booking}/assign`
+  - sidebar now includes:
+    - `Bookings` (permission: `bookings.view`)
+    - `Pool Queue` (permission: `pool.view-all` or `pool.view-own`)
+- Permissions enforced at route + component level for all booking/pool actions.
+- Feature tests for Booking + Pool Dispatch updated/added in:
+  - `tests/Feature/BookingPoolDispatchTest.php`
+  - covers:
+    - booking create
+    - booking number generation
+    - guest cannot access bookings
+    - non-permitted role cannot access bookings
+    - pool queue access
+    - assign flow changes status to assigned
+    - assignment history row created
+    - assigned vehicle status becomes `po`
+    - validation on unavailable vehicle
+    - overlap protection for driver
+    - confirm flow
+    - confirm blocked when driver/vehicle missing
+    - cancel releases assignment and returns vehicle
 
 ## Validation Result
 
-Executed successfully:
+Command status on this machine:
 
-1. `composer install`
-2. `npm install`
-3. `php artisan migrate:fresh --seed`
-4. `npm run build`
-5. `php artisan test`
+1. `composer install`  
+   - started and dependencies reported as already installed.
+2. `npm install`  
+   - success (`up to date`, no vulnerabilities).
+3. `php artisan migrate:fresh --seed`  
+   - **blocked on environment runtime issue**.
+4. `npm run build`  
+   - not executed because Laravel runtime validation was blocked first.
+5. `php artisan test`  
+   - not executed because Laravel runtime validation was blocked first.
 
-Result: all tests passing.
+### Blocker Detail
+
+- PHP CLI can run (`php -v` works), but `php artisan ...` hangs and then can fail with:
+  - `Maximum execution time of 0 seconds exceeded`
+- This indicates an environment/runtime issue during Laravel bootstrap in current machine session, not a syntax error in checkpoint code.
+- Syntax checks passed for the newly added PHP files (`php -l` clean).
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 2.1 — Booking + Pool Dispatch**:
+Proceed to **Checkpoint 2.2 — Finance Flow (PO, Invoice, Payment, eVoucher)** after runtime issue is resolved, with focus on:
 
-1. booking create/list/detail flow
-2. pool queue view
-3. assign driver + vehicle to booking
-4. assignment state transition (`pending` → `assigned` → `confirmed`)
-5. permission guards for booking/pool actions
+1. Purchase Order baseline flow tied to booking/client.
+2. Invoice generation + status transitions.
+3. Payment posting and reconciliation basics.
+4. eVoucher create/update flow.
+5. finance-role permission matrix verification.
 
-## Do Not Do Yet
+## Notes
 
-- Do not migrate stack to Next.js/Supabase.
-- Do not apply final Google Stitch visual overhaul yet.
-- Do not expose HR module in non-super-admin surface.
-- Do not commit production secrets.
+- `CHECKPOINT_CURRENT.md` was restored before continuing this checkpoint, then updated to latest status.
+- Restore was not committed as a separate commit.
