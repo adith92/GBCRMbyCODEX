@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\MaintenanceLog;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Vehicle;
 use Database\Seeders\DatabaseSeeder;
@@ -37,6 +38,24 @@ class GlobalSearchActivityTest extends TestCase
             ->assertOk()
             ->assertSee('Searchable Client')
             ->assertSee($booking->booking_number);
+    }
+
+    public function test_search_scope_limits_results_to_requested_module(): void
+    {
+        $user = User::query()->where('email', 'sales@blueerp.test')->firstOrFail();
+        $client = Client::factory()->create(['name' => 'Scoped Alpha Client']);
+        $booking = Booking::factory()->create([
+            'client_id' => $client->id,
+            'requested_by' => $user->id,
+            'booking_number' => 'Scoped-Alpha-Booking',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('search.index', ['q' => 'Scoped-Alpha', 'scope' => 'booking']))
+            ->assertOk();
+
+        $response->assertSee($booking->booking_number);
+        $this->assertStringNotContainsString(route('crm.clients.show', $client), $response->getContent());
     }
 
     public function test_finance_user_search_does_not_show_vehicle_results_without_permission(): void
@@ -76,5 +95,19 @@ class GlobalSearchActivityTest extends TestCase
             ->get(route('activity.index'))
             ->assertOk()
             ->assertSee($log->title);
+    }
+
+    public function test_activity_type_filter_limits_timeline_results(): void
+    {
+        $user = User::query()->where('email', 'finance@blueerp.test')->firstOrFail();
+        $invoice = Invoice::query()->firstOrFail();
+        $payment = Payment::query()->firstOrFail();
+
+        $response = $this->actingAs($user)
+            ->get(route('activity.index', ['type' => 'invoice']))
+            ->assertOk();
+
+        $response->assertSee($invoice->invoice_number);
+        $this->assertStringNotContainsString($payment->payment_number, $response->getContent());
     }
 }

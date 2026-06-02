@@ -2,7 +2,7 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-6.4-NAVIGATION-SEARCH-ACTIVITY-COMPLETE  
+**Checkpoint ID:** PHASE-7.1-SEARCH-FILTERS-ACTIVITY-DRILLDOWN-COMPLETE  
 **Date:** 2026-06-03  
 **Status:** Complete  
 **Branch:** main
@@ -49,6 +49,12 @@
 - Completed a lightweight demo-navigation polish pass without changing core business logic.
 - Finished validation from the stable clone workspace with clean artisan/test completion.
 
+### Checkpoint 7.1 — Extended Search Filters + Activity Drill-down
+
+- Added module scope filters to global search so demo users can narrow results to a single entity type.
+- Added activity type filters and summary cards for faster drill-down into bookings, invoices, payments, maintenance, and meetings.
+- Extended TDD coverage for scoped search and filtered activity timeline behavior.
+
 ## Validation Result
 
 - Validation completed successfully from the stable clone workspace:
@@ -58,12 +64,15 @@
   - `php artisan test`
 - Current full test result: `90 passed`
 - Original local repository git index instability remains a historical note only; active implementation/validation continued safely from the clean clone workspace.
+- Additional targeted validation for checkpoint 7.1:
+  - `php artisan test tests/Feature/GlobalSearchActivityTest.php`
+  - Result: `6 passed`
 
 ## Known TODO
 
-- Continue with future Phase 6 follow-up only if a broader global command palette, richer activity filters, or extra demo polish is still desired.
-- Optionally re-run Railway smoke tests after these latest phase 6 navigation improvements are deployed.
+- Refresh Railway deployment using the latest phase 7 code.
+- Run live smoke verification after deploy refresh.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 7.1 — Extended Search Filters, Activity Drill-down, and Demo Deployment Refresh** if further iteration is needed.
+Proceed to **Checkpoint 7.2 — Railway Refresh + Smoke Revalidation**.

@@ -18,6 +18,7 @@ class SearchController extends Controller
     {
         $query = trim($request->string('q')->toString());
         $user = $request->user();
+        $scope = $this->normalizeScope($request->string('scope')->toString());
 
         if (! $this->canAccessSearch($user)) {
             abort(403);
@@ -26,21 +27,50 @@ class SearchController extends Controller
         $results = collect();
 
         if ($query !== '') {
-            $results = $results
-                ->concat($this->searchClients($user, $query))
-                ->concat($this->searchVehicles($user, $query))
-                ->concat($this->searchDrivers($user, $query))
-                ->concat($this->searchBookings($user, $query))
-                ->concat($this->searchInvoices($user, $query))
-                ->concat($this->searchMaintenance($user, $query))
-                ->sortBy('label')
-                ->values();
+            $searchers = [
+                'client' => fn () => $this->searchClients($user, $query),
+                'vehicle' => fn () => $this->searchVehicles($user, $query),
+                'driver' => fn () => $this->searchDrivers($user, $query),
+                'booking' => fn () => $this->searchBookings($user, $query),
+                'invoice' => fn () => $this->searchInvoices($user, $query),
+                'maintenance' => fn () => $this->searchMaintenance($user, $query),
+            ];
+
+            foreach ($searchers as $key => $searcher) {
+                if ($scope !== 'all' && $scope !== $key) {
+                    continue;
+                }
+
+                $results = $results->concat($searcher());
+            }
+
+            $results = $results->sortBy('label')->values();
         }
 
         return view('search.index', [
             'query' => $query,
+            'scope' => $scope,
             'results' => $results,
+            'scopeOptions' => $this->scopeOptions(),
         ]);
+    }
+
+    private function normalizeScope(string $scope): string
+    {
+        return array_key_exists($scope, $this->scopeOptions()) ? $scope : 'all';
+    }
+
+    private function scopeOptions(): array
+    {
+        return [
+            'all' => 'All Results',
+            'client' => 'Clients',
+            'vehicle' => 'Vehicles',
+            'driver' => 'Drivers',
+            'booking' => 'Bookings',
+            'invoice' => 'Invoices',
+            'maintenance' => 'Maintenance',
+        ];
     }
 
     private function canAccessSearch($user): bool

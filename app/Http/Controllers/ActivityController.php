@@ -16,24 +16,61 @@ class ActivityController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user();
+        $type = $this->normalizeType($request->string('type')->toString());
 
         if (! $this->canAccessActivity($user)) {
             abort(403);
         }
 
-        $items = collect()
-            ->concat($this->bookingItems($user))
-            ->concat($this->invoiceItems($user))
-            ->concat($this->paymentItems($user))
-            ->concat($this->maintenanceItems($user))
-            ->concat($this->meetingItems($user))
+        $sources = [
+            'booking' => $this->bookingItems($user),
+            'invoice' => $this->invoiceItems($user),
+            'payment' => $this->paymentItems($user),
+            'maintenance' => $this->maintenanceItems($user),
+            'meeting' => $this->meetingItems($user),
+        ];
+
+        $visibleSources = collect($sources)
+            ->filter(fn (Collection $items, string $key) => $type === 'all' || $type === $key);
+
+        $items = $visibleSources
+            ->reduce(fn (Collection $carry, Collection $items) => $carry->concat($items), collect())
             ->sortByDesc('timestamp')
             ->take(25)
             ->values();
 
+        $summary = collect($sources)
+            ->map(fn (Collection $items, string $key) => [
+                'key' => $key,
+                'label' => ucfirst($key),
+                'count' => $items->count(),
+            ])
+            ->filter(fn (array $item) => $item['count'] > 0)
+            ->values();
+
         return view('activity.index', [
             'items' => $items,
+            'type' => $type,
+            'typeOptions' => $this->typeOptions(),
+            'summary' => $summary,
         ]);
+    }
+
+    private function normalizeType(string $type): string
+    {
+        return array_key_exists($type, $this->typeOptions()) ? $type : 'all';
+    }
+
+    private function typeOptions(): array
+    {
+        return [
+            'all' => 'All Activity',
+            'booking' => 'Bookings',
+            'invoice' => 'Invoices',
+            'payment' => 'Payments',
+            'maintenance' => 'Maintenance',
+            'meeting' => 'Meetings',
+        ];
     }
 
     private function canAccessActivity($user): bool

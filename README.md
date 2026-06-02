@@ -15,8 +15,8 @@
 - GitHub: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
 - Branch utama: `main`
 - Live demo Railway: [web-production-c81b8.up.railway.app](https://web-production-c81b8.up.railway.app)
-- Checkpoint platform terakhir: `PHASE-6.4-NAVIGATION-SEARCH-ACTIVITY-COMPLETE`
-- Upgrade UI/UX saat ini: `Checkpoint 6.1 + 6.4`
+- Checkpoint platform terakhir: `PHASE-7.1-SEARCH-FILTERS-ACTIVITY-DRILLDOWN-COMPLETE`
+- Upgrade UI/UX saat ini: `Checkpoint 6.1 + 7.1`
 
 ## 🧱 Stack Final
 
@@ -69,7 +69,9 @@ flowchart LR
 - 🛡️ HR backend-only untuk Super Admin
 - 📊 Dashboard KPI + drill-down
 - 🔎 Global Search lintas modul yang permission-aware
+- 🎯 Search scope filter per modul
 - 🕘 Recent Activity timeline lintas workflow
+- 🧭 Activity filter untuk drill-down yang lebih cepat
 - 🧪 Demo Seeder + QA Docs
 
 ## 🧭 Demo Flow Utama
@@ -137,9 +139,12 @@ Rekomendasi penggunaan:
   - Maintenance
   - HR backend-only
 - Upgrade navigasi, detail-page enrichment, global search, dan recent activity sudah selesai untuk phase 6
+- Extended search filters dan activity drill-down sudah selesai untuk phase 7.1
 - Full validation terbaru dari clone stabil: `90 tests passed`
 - Full build summary tersedia di:
   - [docs/FULL_BUILD_SUMMARY.md](./docs/FULL_BUILD_SUMMARY.md)
+- Changelog checkpoint:
+  - [CHANGELOG.md](./CHANGELOG.md)
 
 ## ⚠️ Prinsip Penting
 

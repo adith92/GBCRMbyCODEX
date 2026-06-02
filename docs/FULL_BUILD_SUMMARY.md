@@ -239,6 +239,15 @@ Selesai:
 - validasi penuh berhasil dari clone workspace stabil
 - total suite terbaru: `90 passed`
 
+### Phase 7.1 — Extended Search Filters + Activity Drill-down
+
+Selesai:
+
+- global search sekarang mendukung scope filter per entity
+- activity timeline sekarang mendukung type filter per workflow
+- summary card ringan untuk activity membantu drill-down saat demo
+- targeted TDD coverage bertambah untuk scoped search dan filtered activity
+
 ## Validation Summary
 
 Yang sudah pernah tercatat berhasil pada checkpoint sebelumnya:

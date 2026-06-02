@@ -9,8 +9,21 @@
     <x-ui.form-card title="Search workspace" description="Search across entities you are allowed to access.">
         <form method="GET" class="flex flex-col gap-3 md:flex-row">
             <input type="text" name="q" value="{{ $query }}" placeholder="Try booking number, client name, plate number, driver, or invoice" class="ui-input md:flex-1">
+            <select name="scope" class="ui-select md:w-56">
+                @foreach ($scopeOptions as $key => $label)
+                    <option value="{{ $key }}" @selected($scope === $key)>{{ $label }}</option>
+                @endforeach
+            </select>
             <x-ui.action-button type="submit" variant="primary">Search</x-ui.action-button>
         </form>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+            @foreach ($scopeOptions as $key => $label)
+                <a href="{{ route('search.index', ['q' => $query, 'scope' => $key]) }}" class="rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] transition {{ $scope === $key ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700' }}">
+                    {{ $label }}
+                </a>
+            @endforeach
+        </div>
     </x-ui.form-card>
 
     <x-ui.table-card title="Results" description="Permission-aware search results across the current workspace.">
