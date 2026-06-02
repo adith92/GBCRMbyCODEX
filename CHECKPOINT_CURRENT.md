@@ -2,75 +2,93 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-4.2-DEMO-AUDIT-PASSED  
+**Checkpoint ID:** PHASE-5.1-UI-POLISH-RAILWAY-PREP-COMPLETE  
 **Date:** 2026-06-02  
 **Status:** Completed  
 **Branch:** main
 
-## Audit Summary
+## UI Polish Summary
 
-- Demo accounts are documented clearly and use a shared demo password: `password`.
-- Route and sidebar audit confirms primary demo modules are wired:
-  - Dashboard
-  - CRM
-  - Fleet
-  - Drivers
-  - Bookings
-  - Pool Queue
-  - Finance
-  - Maintenance
-- HR remains restricted to super-admin routes and is not shown to ordinary roles in the audited layout.
-- Finance navigation is permission-gated and not expected to appear for pool-only roles.
-- Demo seeder is configured to provide realistic counts and mixed statuses for:
-  - clients
-  - vehicles
-  - drivers
-  - bookings
-  - invoices
-  - payments
-  - maintenance logs
-  - e-vouchers
-  - driver attendance
-- Demo docs and QA checklist were tightened so the audit coverage now explicitly includes:
-  - GM dashboard walkthrough
-  - confirm booking step
-  - e-voucher scenario
-  - HR super-admin-only scenario
-  - drill-down verification
-  - seeder verification
-  - Railway deploy prep
-  - production guidance for `APP_DEBUG=false`
+- Introduced reusable UI Blade components for:
+  - stat cards
+  - status badges
+  - page headers
+  - empty states
+  - action buttons
+  - table cards
+  - form cards
+- Refreshed the base layout with:
+  - cleaner topbar
+  - enterprise-style sidebar
+  - clearer active states
+  - responsive sidebar behavior
+  - more consistent content width and spacing
+- Polished demo-priority pages:
+  - dashboard
+  - bookings index/create/show
+  - pool queue
+  - finance dashboard
+  - purchase order index
+  - invoice index/show
+  - e-voucher index
+  - client detail
+  - vehicle detail
+  - maintenance index
+  - HR driver admin page
+- Applied a Bluebird-inspired visual direction using corporate blue, restrained neutral surfaces, and clearer state hierarchy for finance, fleet, and maintenance statuses.
+
+## Railway Prep Files
+
+Added deployment prep assets:
+
+- `railway/init-app.sh`
+- `railway/run-worker.sh`
+- `railway/run-cron.sh`
+- `.env.railway.example`
+- `docs/RAILWAY_DEPLOYMENT.md`
+
+Updated docs:
+
+- `README.md` with Railway deployment section, build/pre-deploy guidance, and smoke test checklist
 
 ## Validation Result
 
-Audit validation status:
+Validation attempted:
 
 1. `composer install`
-   - Dependency resolution completed and autoload generation was reached.
-   - In this environment, Composer again showed the previously observed behavior where the process did not return cleanly after completion output.
+   - Reached dependency verification and autoload generation output.
+   - Environment again did not return a clean completion signal afterward.
 2. `npm install`
-   - Completed successfully.
+   - Included in the attempted full sequence, but the full combined run was blocked by the same environment hang pattern.
 3. `php artisan optimize:clear`
-   - Command was attempted, but this environment again exhibited the same hang pattern seen in prior runtime-related work.
+   - Attempted separately.
+   - Environment did not return a clean completion signal.
 4. `php artisan migrate:fresh --seed`
-   - Command was attempted for audit verification, but the current environment did not return a clean completion signal during this audit run.
+   - Attempted separately.
+   - Environment did not return a clean completion signal.
 5. `npm run build`
-   - Build command was attempted; this environment again kept the process open without returning a final completion signal during the audit run.
+   - Attempted separately.
+   - Environment did not return a clean completion signal.
 6. `php artisan test`
-   - The repository still contains the previously recorded green baseline from Phase 4.1: **82 tests passed, 0 failed**.
+   - Attempted separately.
+   - Environment did not return a clean completion signal.
 
-Recorded baseline before this audit:
+Additional checks completed:
 
-- `PHASE-4.1-DEMO-READY`
-- validation recorded: **82 tests passed, 0 failed**
-- working tree was clean before audit updates
+- `sh -n railway/init-app.sh railway/run-worker.sh railway/run-cron.sh` -> passed
+- Manual review completed on updated Blade layout, UI components, dashboard, finance, pool, maintenance, client, vehicle, and HR driver views
+
+Notes:
+
+- Because the runtime environment did not provide clean completion signals, this checkpoint does **not** claim fresh full validation passing.
+- The last previously recorded green baseline remains from the earlier checkpoint before this UI/deploy-prep update.
 
 ## Known TODO
 
-- Re-run full validation in a fully stable local runtime before Railway deployment prep so audit status can carry a fresh execution log instead of relying partly on the last recorded green baseline.
-- Add a dedicated deployment runbook with production env examples.
-- Apply Google Stitch UI polish after business flow freeze.
+- Polish remaining lower-priority CRUD pages for complete visual consistency.
+- Run a dedicated mobile 375px browser pass.
+- Re-run full validation in a stable runtime before deployment checkpoint.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 5.1 — Google Stitch UI Polish + Railway Deployment Prep**.
+Proceed to **Checkpoint 5.2 — Railway Deployment**.

@@ -5,52 +5,51 @@
         ['label' => $vehicle->plate_number, 'url' => route('fleet.vehicles.show', $vehicle)],
     ]" />
 
-    <section class="rounded-lg border border-slate-200 bg-white p-4 text-sm">
-        <div class="grid gap-2 md:grid-cols-2">
-            <p><strong>Plate:</strong> {{ $vehicle->plate_number }}</p>
-            <p><strong>Pool:</strong> {{ $vehicle->pool?->name ?? '-' }}</p>
-            <p><strong>Line:</strong> {{ strtoupper($vehicle->product_line) }}</p>
-            <p><strong>Status:</strong> {{ strtoupper($vehicle->status) }}</p>
-            <p><strong>Brand/Model:</strong> {{ $vehicle->brand }} {{ $vehicle->model }}</p>
-            <p><strong>Year:</strong> {{ $vehicle->year ?? '-' }}</p>
-        </div>
-        <div class="mt-4 flex gap-2">
-            @can('vehicles.update')<a href="{{ route('fleet.vehicles.edit', $vehicle) }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm">Edit</a>@endcan
-            @can('vehicles.delete')
-            <form method="POST" action="{{ route('fleet.vehicles.destroy', $vehicle) }}" onsubmit="return confirm('Delete this vehicle?')">
-                @csrf @method('DELETE')
-                <button class="rounded-md border border-red-300 px-3 py-2 text-sm text-red-600">Delete</button>
-            </form>
-            @endcan
+    <x-ui.page-header :title="$vehicle->plate_number" eyebrow="Vehicle Detail" description="Fleet metadata, booking linkage, and maintenance visibility for operational decisions.">
+        <x-slot:actions>
+            <x-ui.status-badge :status="$vehicle->status" />
             <x-back-link :fallback="route('fleet.vehicles.index')" />
-        </div>
-    </section>
+        </x-slot:actions>
+    </x-ui.page-header>
 
-    <section class="rounded-lg border border-slate-200 bg-white p-4">
-        <h3 class="text-base font-semibold">Booking History</h3>
-        <div class="mt-3 space-y-2 text-sm">
-            @forelse($vehicle->bookings as $booking)
-                <a href="{{ route('bookings.show', $booking) }}" class="block rounded border p-3 hover:bg-slate-50">
-                    {{ $booking->booking_number }}
-                    <span class="float-right uppercase text-xs">{{ $booking->status }}</span>
-                </a>
-            @empty
-                <p class="text-slate-500">No bookings linked to this vehicle.</p>
-            @endforelse
+    <x-ui.form-card title="Vehicle snapshot" description="Read-only fleet details used by dispatch and maintenance teams.">
+        <dl class="ui-meta-grid">
+            <div class="ui-meta-item"><dt>Plate</dt><dd>{{ $vehicle->plate_number }}</dd></div>
+            <div class="ui-meta-item"><dt>Pool</dt><dd>{{ $vehicle->pool?->name ?? '-' }}</dd></div>
+            <div class="ui-meta-item"><dt>Line</dt><dd>{{ strtoupper($vehicle->product_line) }}</dd></div>
+            <div class="ui-meta-item"><dt>Status</dt><dd><x-ui.status-badge :status="$vehicle->status" /></dd></div>
+            <div class="ui-meta-item"><dt>Brand / Model</dt><dd>{{ $vehicle->brand }} {{ $vehicle->model }}</dd></div>
+            <div class="ui-meta-item"><dt>Year</dt><dd>{{ $vehicle->year ?? '-' }}</dd></div>
+        </dl>
+        <div class="mt-5 flex flex-wrap gap-3">
+            @can('vehicles.update')<x-ui.action-button :href="route('fleet.vehicles.edit', $vehicle)" variant="secondary">Edit</x-ui.action-button>@endcan
+            @can('vehicles.delete')<form method="POST" action="{{ route('fleet.vehicles.destroy', $vehicle) }}" onsubmit="return confirm('Delete this vehicle?')">@csrf @method('DELETE')<x-ui.action-button type="submit" variant="danger">Delete</x-ui.action-button></form>@endcan
         </div>
-    </section>
+    </x-ui.form-card>
 
-    <section class="rounded-lg border border-slate-200 bg-white p-4">
-        <h3 class="text-base font-semibold">Maintenance Logs</h3>
-        <div class="mt-3 space-y-2 text-sm">
-            @forelse($vehicle->maintenanceLogs as $log)
-                <a href="{{ route('maintenance.show', $log) }}" class="block rounded border p-3 hover:bg-slate-50">
-                    {{ $log->title }}
-                    <span class="float-right uppercase text-xs">{{ $log->status }}</span>
-                </a>
-            @empty
-                <p class="text-slate-500">No maintenance logs yet.</p>
-            @endforelse
-        </div>
+    <section class="grid gap-5 xl:grid-cols-2">
+        <x-ui.table-card title="Booking History" description="Bookings that have been linked to this unit.">
+            <div class="space-y-3 p-5 text-sm">
+                @forelse($vehicle->bookings as $booking)
+                    <a href="{{ route('bookings.show', $booking) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50/50">
+                        <div class="flex items-start justify-between gap-3"><p class="font-semibold text-slate-900">{{ $booking->booking_number }}</p><x-ui.status-badge :status="$booking->status" /></div>
+                    </a>
+                @empty
+                    <x-ui.empty-state title="No bookings linked" description="Assignments involving this vehicle will appear here over time." />
+                @endforelse
+            </div>
+        </x-ui.table-card>
+
+        <x-ui.table-card title="Maintenance Logs" description="Workshop and service history for this vehicle.">
+            <div class="space-y-3 p-5 text-sm">
+                @forelse($vehicle->maintenanceLogs as $log)
+                    <a href="{{ route('maintenance.show', $log) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-50/40">
+                        <div class="flex items-start justify-between gap-3"><p class="font-semibold text-slate-900">{{ $log->title }}</p><x-ui.status-badge :status="$log->status" /></div>
+                    </a>
+                @empty
+                    <x-ui.empty-state title="No maintenance logs yet" description="Operation-created maintenance cases will appear here." />
+                @endforelse
+            </div>
+        </x-ui.table-card>
     </section>
 </x-layouts.app>

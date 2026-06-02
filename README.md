@@ -120,3 +120,52 @@ Semua akun demo menggunakan password: `password`
 
 Project ini dibangun, dirapikan, dan didorong checkpoint demi checkpoint oleh **CODEX** sebagai coding partner implementasi.  
 Targetnya bukan cuma kode jalan, tapi juga repo yang rapi, demo yang siap dipresentasikan, dan flow bisnis yang gampang di-follow. 🤝
+
+## Railway Deploy 🚂
+
+### Quick Deploy Flow
+
+1. Deploy from GitHub repo: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
+2. Add a MySQL database service in Railway
+3. Fill required environment variables from `.env.railway.example`
+4. Generate app key locally:
+
+```bash
+php artisan key:generate --show
+```
+
+5. Set build command:
+
+```bash
+composer install --no-interaction --prefer-dist --optimize-autoloader
+npm install
+npm run build
+```
+
+6. Set pre-deploy command:
+
+```bash
+sh railway/init-app.sh
+```
+
+7. Generate a public Railway domain
+8. Set `APP_URL` to that Railway domain
+9. If you want seeded demo data, set:
+
+```bash
+ENABLE_DEMO_SEED=true
+```
+
+### Smoke Test Checklist
+
+- Login page opens ✅
+- Dashboard opens ✅
+- Bookings page opens ✅
+- Finance page opens ✅
+- Maintenance page opens ✅
+- No obvious 500 error in logs ✅
+- Logout works ✅
+
+### Deployment Docs
+
+- Detailed guide: [docs/RAILWAY_DEPLOYMENT.md](./docs/RAILWAY_DEPLOYMENT.md)

@@ -5,105 +5,120 @@
         ['label' => $booking->booking_number, 'url' => route('bookings.show', $booking)],
     ]" />
 
+    <x-ui.page-header :title="$booking->booking_number" eyebrow="Booking Detail" description="Review commercial context, assignment readiness, linked finance documents, and dispatch history.">
+        <x-slot:actions>
+            <x-ui.status-badge :status="$booking->status" />
+            <x-back-link :fallback="route('bookings.index')" />
+        </x-slot:actions>
+    </x-ui.page-header>
+
     @if ($errorMessage)
-        <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errorMessage }}</div>
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{{ $errorMessage }}</div>
     @endif
 
-    <section class="rounded-lg border border-slate-200 bg-white p-4 text-sm">
-        <div class="grid gap-2 md:grid-cols-2">
-            <p><strong>Booking Number:</strong> {{ $booking->booking_number }}</p>
-            <p><strong>Status:</strong> <span class="rounded-full bg-slate-100 px-2 py-1 text-xs uppercase">{{ $booking->status }}</span></p>
-            <p><strong>Client:</strong> @if($booking->client)<a href="{{ route('crm.clients.show', $booking->client) }}" class="text-blue-600 hover:underline">{{ $booking->client->name }}</a>@else - @endif</p>
-            <p><strong>Pool:</strong> {{ $booking->pool?->name ?? '-' }}</p>
-            <p><strong>Vehicle:</strong> @if($booking->vehicle)<a href="{{ route('fleet.vehicles.show', $booking->vehicle) }}" class="text-blue-600 hover:underline">{{ $booking->vehicle->plate_number }}</a>@else - @endif</p>
-            <p><strong>Driver:</strong> @if($booking->driver)<a href="{{ route('drivers.show', $booking->driver) }}" class="text-blue-600 hover:underline">{{ $booking->driver->name }}</a>@else - @endif</p>
-            <p><strong>Start:</strong> {{ $booking->start_datetime?->format('Y-m-d H:i') }}</p>
-            <p><strong>End:</strong> {{ $booking->end_datetime?->format('Y-m-d H:i') }}</p>
-        </div>
-        <p class="mt-3"><strong>Pickup:</strong> {{ $booking->pickup_location ?: '-' }}</p>
-        <p class="mt-1"><strong>Destination:</strong> {{ $booking->destination ?: '-' }}</p>
-        <p class="mt-1"><strong>Notes:</strong> {{ $booking->notes ?: '-' }}</p>
+    <x-ui.form-card title="Booking snapshot" description="Core operational and commercial data for this request.">
+        <dl class="ui-meta-grid">
+            <div class="ui-meta-item"><dt>Booking Number</dt><dd>{{ $booking->booking_number }}</dd></div>
+            <div class="ui-meta-item"><dt>Status</dt><dd><x-ui.status-badge :status="$booking->status" /></dd></div>
+            <div class="ui-meta-item"><dt>Client</dt><dd>@if($booking->client)<a href="{{ route('crm.clients.show', $booking->client) }}" class="ui-link">{{ $booking->client->name }}</a>@else - @endif</dd></div>
+            <div class="ui-meta-item"><dt>Pool</dt><dd>{{ $booking->pool?->name ?? '-' }}</dd></div>
+            <div class="ui-meta-item"><dt>Vehicle</dt><dd>@if($booking->vehicle)<a href="{{ route('fleet.vehicles.show', $booking->vehicle) }}" class="ui-link">{{ $booking->vehicle->plate_number }}</a>@else - @endif</dd></div>
+            <div class="ui-meta-item"><dt>Driver</dt><dd>@if($booking->driver)<a href="{{ route('drivers.show', $booking->driver) }}" class="ui-link">{{ $booking->driver->name }}</a>@else - @endif</dd></div>
+            <div class="ui-meta-item"><dt>Start</dt><dd>{{ $booking->start_datetime?->format('Y-m-d H:i') }}</dd></div>
+            <div class="ui-meta-item"><dt>End</dt><dd>{{ $booking->end_datetime?->format('Y-m-d H:i') }}</dd></div>
+            <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Pickup</dt><dd>{{ $booking->pickup_location ?: '-' }}</dd></div>
+            <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Destination</dt><dd>{{ $booking->destination ?: '-' }}</dd></div>
+            <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Notes</dt><dd>{{ $booking->notes ?: '-' }}</dd></div>
+        </dl>
 
-        <div class="mt-4 flex flex-wrap gap-2">
+        <div class="mt-5 flex flex-wrap gap-3">
             @can('bookings.update')
-                <a href="{{ route('bookings.edit', $booking) }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm">Edit</a>
+                <x-ui.action-button :href="route('bookings.edit', $booking)" variant="secondary">Edit</x-ui.action-button>
             @endcan
             @can('pool.assign-driver')
                 @if (in_array($booking->status, ['pending', 'assigned'], true))
-                    <a href="{{ route('pool.assign', $booking) }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm">Assign Driver & Vehicle</a>
+                    <x-ui.action-button :href="route('pool.assign', $booking)" variant="primary">Assign Driver & Vehicle</x-ui.action-button>
                 @endif
             @endcan
             @can('bookings.approve')
                 @if ($booking->status === 'assigned')
-                    <button wire:click="confirm" wire:confirm="Confirm this booking?" class="rounded-md bg-emerald-600 px-3 py-2 text-sm text-white">Confirm</button>
+                    <x-ui.action-button wire:click="confirm" wire:confirm="Confirm this booking?" variant="success">Confirm Booking</x-ui.action-button>
                 @endif
             @endcan
             @can('bookings.cancel')
                 @if (in_array($booking->status, ['pending', 'assigned', 'confirmed'], true))
-                    <button wire:click="cancel" wire:confirm="Cancel this booking?" class="rounded-md bg-red-600 px-3 py-2 text-sm text-white">Cancel</button>
+                    <x-ui.action-button wire:click="cancel" wire:confirm="Cancel this booking?" variant="danger">Cancel Booking</x-ui.action-button>
                 @endif
             @endcan
-            <x-back-link :fallback="route('bookings.index')" />
         </div>
-    </section>
+    </x-ui.form-card>
 
     @if($booking->purchaseOrders->isNotEmpty())
-        <section class="rounded-lg border border-slate-200 bg-white p-4">
-            <h3 class="text-base font-semibold">Purchase Orders</h3>
-            <div class="mt-3 space-y-2 text-sm">
+        <x-ui.table-card title="Purchase Orders" description="Finance documents already linked to this booking.">
+            <div class="space-y-3 p-5 text-sm">
                 @foreach($booking->purchaseOrders as $purchaseOrder)
-                    <a href="{{ route('finance.purchase-orders.show', $purchaseOrder) }}" class="block rounded border p-3 hover:bg-slate-50">
-                        {{ $purchaseOrder->po_number }}
-                        <span class="float-right uppercase text-xs">{{ $purchaseOrder->status }}</span>
+                    <a href="{{ route('finance.purchase-orders.show', $purchaseOrder) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50/50">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="font-semibold text-slate-900">{{ $purchaseOrder->po_number }}</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ number_format($purchaseOrder->total, 2) }}</p>
+                            </div>
+                            <x-ui.status-badge :status="$purchaseOrder->status" />
+                        </div>
                     </a>
                 @endforeach
             </div>
-        </section>
+        </x-ui.table-card>
     @endif
 
     @if($booking->purchaseOrders->flatMap->invoices->isNotEmpty())
-        <section class="rounded-lg border border-slate-200 bg-white p-4">
-            <h3 class="text-base font-semibold">Invoices</h3>
-            <div class="mt-3 space-y-2 text-sm">
+        <x-ui.table-card title="Invoices" description="Invoices generated through related purchase orders.">
+            <div class="space-y-3 p-5 text-sm">
                 @foreach($booking->purchaseOrders->flatMap->invoices as $invoice)
-                    <a href="{{ route('finance.invoices.show', $invoice) }}" class="block rounded border p-3 hover:bg-slate-50">
-                        {{ $invoice->invoice_number }}
-                        <span class="float-right uppercase text-xs">{{ $invoice->status }}</span>
+                    <a href="{{ route('finance.invoices.show', $invoice) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-emerald-200 hover:bg-emerald-50/40">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="font-semibold text-slate-900">{{ $invoice->invoice_number }}</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ number_format($invoice->total, 2) }}</p>
+                            </div>
+                            <x-ui.status-badge :status="$invoice->status" />
+                        </div>
                     </a>
                 @endforeach
             </div>
-        </section>
+        </x-ui.table-card>
     @endif
 
-    <section class="rounded-lg border border-slate-200 bg-white p-4">
-        <h3 class="text-base font-semibold">Driver Assignment History</h3>
+    <x-ui.table-card title="Driver Assignment History" description="Track reassignment and release events for dispatch visibility.">
         @if($booking->driverAssignments->isEmpty())
-            <p class="mt-2 text-sm text-slate-500">No assignment history yet.</p>
+            <div class="p-5">
+                <x-ui.empty-state title="No assignment history yet" description="Assignments will be listed here once the pool team starts dispatching." />
+            </div>
         @else
-            <div class="mt-3 overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-slate-50">
+            <div class="ui-table-wrap">
+                <table class="ui-table">
+                    <thead>
                     <tr>
-                        <th class="px-4 py-3 text-left">Assigned At</th>
-                        <th class="px-4 py-3 text-left">Driver</th>
-                        <th class="px-4 py-3 text-left">Vehicle</th>
-                        <th class="px-4 py-3 text-left">By</th>
-                        <th class="px-4 py-3 text-left">Released</th>
+                        <th>Assigned At</th>
+                        <th>Driver</th>
+                        <th>Vehicle</th>
+                        <th>By</th>
+                        <th>Released</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($booking->driverAssignments as $assignment)
-                        <tr class="border-t">
-                            <td class="px-4 py-3">{{ $assignment->assigned_at?->format('Y-m-d H:i') }}</td>
-                            <td class="px-4 py-3">{{ $assignment->driver?->name ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $assignment->vehicle?->plate_number ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $assignment->assignedBy?->name ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $assignment->released_at?->format('Y-m-d H:i') ?? '-' }}</td>
+                        <tr>
+                            <td>{{ $assignment->assigned_at?->format('Y-m-d H:i') }}</td>
+                            <td>{{ $assignment->driver?->name ?? '-' }}</td>
+                            <td>{{ $assignment->vehicle?->plate_number ?? '-' }}</td>
+                            <td>{{ $assignment->assignedBy?->name ?? '-' }}</td>
+                            <td>{{ $assignment->released_at?->format('Y-m-d H:i') ?? '-' }}</td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
             </div>
         @endif
-    </section>
+    </x-ui.table-card>
 </x-layouts.app>

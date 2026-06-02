@@ -1,3 +1,97 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-slate-100 text-slate-800 antialiased;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .app-shell {
+        @apply min-h-screen bg-[radial-gradient(circle_at_top,_rgba(30,64,175,0.08),_transparent_30%),linear-gradient(180deg,_#f8fbff_0%,_#eef3f8_48%,_#f8fafc_100%)];
+    }
+
+    .ui-card {
+        @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.35)];
+    }
+
+    .ui-card-muted {
+        @apply rounded-2xl border border-slate-200/70 bg-slate-50/80;
+    }
+
+    .ui-section-title {
+        @apply text-sm font-semibold uppercase tracking-[0.18em] text-slate-500;
+    }
+
+    .ui-input,
+    .ui-select,
+    .ui-textarea {
+        @apply mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100;
+    }
+
+    .ui-textarea {
+        @apply min-h-[96px];
+    }
+
+    .ui-label {
+        @apply text-xs font-semibold uppercase tracking-[0.16em] text-slate-500;
+    }
+
+    .ui-error {
+        @apply mt-1 text-xs font-medium text-rose-600;
+    }
+
+    .ui-table-wrap {
+        @apply overflow-x-auto;
+    }
+
+    .ui-table {
+        @apply min-w-full text-sm;
+    }
+
+    .ui-table thead {
+        @apply bg-slate-50/90 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500;
+    }
+
+    .ui-table th {
+        @apply px-4 py-3;
+    }
+
+    .ui-table td {
+        @apply px-4 py-3 align-top;
+    }
+
+    .ui-table tbody tr {
+        @apply border-t border-slate-200/80;
+    }
+
+    .ui-table tbody tr:hover {
+        @apply bg-slate-50/70;
+    }
+
+    .ui-link {
+        @apply font-medium text-blue-700 transition hover:text-blue-900 hover:underline;
+    }
+
+    .ui-meta-grid {
+        @apply grid gap-3 md:grid-cols-2 xl:grid-cols-3;
+    }
+
+    .ui-meta-item {
+        @apply rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3;
+    }
+
+    .ui-meta-item dt {
+        @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500;
+    }
+
+    .ui-meta-item dd {
+        @apply mt-2 text-sm font-medium text-slate-800;
+    }
+}

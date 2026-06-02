@@ -2,7 +2,9 @@
     $user = auth()->user();
     $activeClients = \App\Models\Client::query()->where('status', 'active')->count();
     $activeBookings = \App\Models\Booking::query()->whereIn('status', ['pending', 'assigned', 'confirmed'])->count();
+    $pendingBookings = \App\Models\Booking::query()->where('status', 'pending')->count();
     $availableVehicles = \App\Models\Vehicle::query()->where('status', 'available')->count();
+    $vehiclesInPo = \App\Models\Vehicle::query()->where('status', 'po')->count();
     $vehiclesInMaintenance = \App\Models\Vehicle::query()->where('status', 'maintenance')->count();
     $outstandingInvoiceAmount = (float) \App\Models\Invoice::query()->whereIn('status', ['sent', 'partial', 'overdue'])->sum('total')
         - (float) \App\Models\Invoice::query()->whereIn('status', ['sent', 'partial', 'overdue'])->sum('paid_amount');
@@ -16,47 +18,92 @@
 <x-layouts.app :title="'Dashboard'" :header="'Dashboard'">
     <x-breadcrumbs :items="[['label' => 'Dashboard', 'url' => route('dashboard')]]" />
 
-    <section class="grid gap-3 md:grid-cols-4">
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Total Active Clients</p><p class="mt-1 text-2xl font-semibold">{{ $activeClients }}</p></div>
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Active Bookings</p><p class="mt-1 text-2xl font-semibold">{{ $activeBookings }}</p></div>
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Available Vehicles</p><p class="mt-1 text-2xl font-semibold">{{ $availableVehicles }}</p></div>
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Vehicles in Maintenance</p><p class="mt-1 text-2xl font-semibold">{{ $vehiclesInMaintenance }}</p></div>
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Outstanding Invoice Amount</p><p class="mt-1 text-2xl font-semibold">{{ number_format(max(0, $outstandingInvoiceAmount), 2) }}</p></div>
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Overdue Invoices</p><p class="mt-1 text-2xl font-semibold">{{ $overdueInvoices }}</p></div>
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Today Pool Queue Count</p><p class="mt-1 text-2xl font-semibold">{{ $todayPoolQueueCount }}</p></div>
-        <div class="rounded-lg border bg-white p-4"><p class="text-xs text-slate-500">Current Role</p><p class="mt-1 text-lg font-semibold">{{ $user?->getRoleNames()->join(', ') }}</p></div>
+    <x-ui.page-header title="Enterprise operations at a glance" eyebrow="GM Dashboard" description="Track client activity, dispatch readiness, finance exposure, and maintenance signals from a single Bluebird-inspired command center.">
+        <x-slot:actions>
+            <div class="ui-card-muted px-4 py-3 text-right">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Current Role</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">{{ $user?->getRoleNames()->join(', ') }}</p>
+            </div>
+        </x-slot:actions>
+    </x-ui.page-header>
+
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <x-ui.stat-card label="Total Active Clients" :value="$activeClients" hint="Accounts currently ready for commercial follow-up." tone="blue" />
+        <x-ui.stat-card label="Active Bookings" :value="$activeBookings" hint="Pending, assigned, and confirmed workload in motion." tone="emerald" />
+        <x-ui.stat-card label="Pending Bookings" :value="$pendingBookings" hint="Need dispatch review or commercial follow-up." tone="amber" />
+        <x-ui.stat-card label="Available Vehicles" :value="$availableVehicles" hint="Fleet units currently ready for assignment." tone="blue" />
+        <x-ui.stat-card label="Vehicles In PO" :value="$vehiclesInPo" hint="Already committed to upcoming dispatch activity." tone="amber" />
+        <x-ui.stat-card label="Vehicles In Maintenance" :value="$vehiclesInMaintenance" hint="Temporarily unavailable due to workshop handling." tone="rose" />
+        <x-ui.stat-card label="Outstanding Invoices" :value="number_format(max(0, $outstandingInvoiceAmount), 2)" hint="Open finance exposure from sent, partial, and overdue invoices." tone="slate" />
+        <x-ui.stat-card label="Overdue Invoices" :value="$overdueInvoices" hint="Invoices that need urgent collection attention." tone="rose" />
+        <x-ui.stat-card label="Today Pool Queue" :value="$todayPoolQueueCount" hint="Dispatch queue requiring same-day operational attention." tone="amber" />
     </section>
 
-    <section class="grid gap-4 lg:grid-cols-3">
-        <div class="rounded-lg border bg-white p-4">
-            <h3 class="text-sm font-semibold">Latest Bookings</h3>
-            <div class="mt-3 space-y-2 text-sm">
-                @foreach ($latestBookings as $booking)
-                    <a href="{{ route('bookings.show', $booking) }}" class="block rounded border p-2 hover:bg-slate-50">
-                        {{ $booking->booking_number }} - {{ $booking->client?->name ?? '-' }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
-        <div class="rounded-lg border bg-white p-4">
-            <h3 class="text-sm font-semibold">Latest Payments</h3>
-            <div class="mt-3 space-y-2 text-sm">
-                @foreach ($latestPayments as $payment)
-                    <a href="{{ route('finance.invoices.show', $payment->invoice) }}" class="block rounded border p-2 hover:bg-slate-50">
-                        {{ $payment->payment_number }} - {{ number_format($payment->amount, 2) }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
-        <div class="rounded-lg border bg-white p-4">
-            <h3 class="text-sm font-semibold">Latest Maintenance Logs</h3>
-            <div class="mt-3 space-y-2 text-sm">
-                @foreach ($latestMaintenanceLogs as $log)
-                    <a href="{{ route('maintenance.show', $log) }}" class="block rounded border p-2 hover:bg-slate-50">
-                        {{ $log->title }} - {{ $log->vehicle?->plate_number ?? '-' }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
+    <section class="grid gap-5 xl:grid-cols-3">
+        <x-ui.table-card title="Latest Bookings" description="Recent booking activity with fast drill-down into operational detail.">
+            @if ($latestBookings->isEmpty())
+                <div class="p-5">
+                    <x-ui.empty-state title="No bookings yet" description="New bookings will appear here once the sales or pool flow starts moving." />
+                </div>
+            @else
+                <div class="space-y-3 p-5">
+                    @foreach ($latestBookings as $booking)
+                        <a href="{{ route('bookings.show', $booking) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50/60">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-slate-900">{{ $booking->booking_number }}</p>
+                                    <p class="mt-1 text-sm text-slate-500">{{ $booking->client?->name ?? '-' }}</p>
+                                </div>
+                                <x-ui.status-badge :status="$booking->status" />
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </x-ui.table-card>
+
+        <x-ui.table-card title="Latest Payments" description="Fast visibility into recent collections and invoice progress.">
+            @if ($latestPayments->isEmpty())
+                <div class="p-5">
+                    <x-ui.empty-state title="No payments yet" description="Payment activity will appear once the finance flow records collections." />
+                </div>
+            @else
+                <div class="space-y-3 p-5">
+                    @foreach ($latestPayments as $payment)
+                        <a href="{{ route('finance.invoices.show', $payment->invoice) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-emerald-200 hover:bg-emerald-50/40">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-slate-900">{{ $payment->payment_number }}</p>
+                                    <p class="mt-1 text-sm text-slate-500">{{ number_format($payment->amount, 2) }}</p>
+                                </div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{{ $payment->paid_at?->format('Y-m-d') }}</p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </x-ui.table-card>
+
+        <x-ui.table-card title="Latest Maintenance Logs" description="Recent maintenance movement to support fleet readiness decisions.">
+            @if ($latestMaintenanceLogs->isEmpty())
+                <div class="p-5">
+                    <x-ui.empty-state title="No maintenance logs yet" description="Maintenance entries will show up here once the operation team opens a new case." />
+                </div>
+            @else
+                <div class="space-y-3 p-5">
+                    @foreach ($latestMaintenanceLogs as $log)
+                        <a href="{{ route('maintenance.show', $log) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50/50">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-slate-900">{{ $log->title }}</p>
+                                    <p class="mt-1 text-sm text-slate-500">{{ $log->vehicle?->plate_number ?? '-' }}</p>
+                                </div>
+                                <x-ui.status-badge :status="$log->status" />
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </x-ui.table-card>
     </section>
 </x-layouts.app>

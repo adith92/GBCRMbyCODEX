@@ -1,33 +1,35 @@
 <x-layouts.app :title="'HR Drivers'" :header="'HR / Drivers'">
     <x-breadcrumbs :items="$breadcrumbs" />
 
-    <section class="rounded-lg border bg-white p-4">
-        <input wire:model.live.debounce.300ms="search" placeholder="Search driver name" class="w-full rounded border-slate-300 text-sm">
-    </section>
+    <x-ui.page-header title="Driver master records" eyebrow="HR Backend Only" description="Restricted view for driver identity, pool placement, and license validity monitoring." />
 
-    <section class="rounded-lg border bg-white">
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="bg-slate-50">
+    <x-ui.form-card title="Filter Drivers" description="Search by name, employee code, or license number.">
+        <input wire:model.live.debounce.300ms="search" placeholder="Search driver name" class="ui-input">
+    </x-ui.form-card>
+
+    <x-ui.table-card title="Driver Registry" description="Super-admin operational HR view of driver records.">
+        <div class="ui-table-wrap">
+            <table class="ui-table">
+                <thead>
                 <tr>
-                    <th class="px-4 py-3 text-left">Driver</th>
-                    <th class="px-4 py-3 text-left">Pool</th>
-                    <th class="px-4 py-3 text-left">Status</th>
-                    <th class="px-4 py-3 text-left">License Expired At</th>
+                    <th>Driver</th>
+                    <th>Pool</th>
+                    <th>Status</th>
+                    <th>License Expired At</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($drivers as $driver)
-                    <tr class="border-t">
-                        <td class="px-4 py-3">{{ $driver->name }}</td>
-                        <td class="px-4 py-3">{{ $driver->pool?->name ?? '-' }}</td>
-                        <td class="px-4 py-3 uppercase text-xs">{{ $driver->status }}</td>
-                        <td class="px-4 py-3">{{ $driver->license_expired_at?->format('Y-m-d') ?? '-' }}</td>
+                    <tr>
+                        <td><a href="{{ route('drivers.show', $driver) }}" class="ui-link">{{ $driver->name }}</a></td>
+                        <td>{{ $driver->pool?->name ?? '-' }}</td>
+                        <td><x-ui.status-badge :status="$driver->status" /></td>
+                        <td>{{ $driver->license_expired_at?->format('Y-m-d') ?? '-' }}</td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
         </div>
-        <div class="p-4">{{ $drivers->links() }}</div>
-    </section>
+        <div class="border-t border-slate-200/80 px-4 py-4">{{ $drivers->links() }}</div>
+    </x-ui.table-card>
 </x-layouts.app>

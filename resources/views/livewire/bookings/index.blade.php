@@ -1,54 +1,65 @@
 <x-layouts.app :title="'Bookings'" :header="'Bookings'">
-    <section class="rounded-lg border border-slate-200 bg-white p-4">
+    <x-ui.page-header title="Booking pipeline" eyebrow="Bookings" description="Monitor incoming requests, filter operational status, and jump quickly into dispatch or finance drill-down.">
+        <x-slot:actions>
+            @can('bookings.create')
+                <x-ui.action-button :href="route('bookings.create')" variant="primary">+ New Booking</x-ui.action-button>
+            @endcan
+        </x-slot:actions>
+    </x-ui.page-header>
+
+    <x-ui.form-card title="Filter Bookings" description="Search by booking or client name, then narrow by status and schedule window.">
         <div class="grid gap-3 md:grid-cols-5">
-            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search booking/client" class="rounded-md border-slate-300 text-sm">
-            <select wire:model.live="status" class="rounded-md border-slate-300 text-sm">
+            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search booking or client" class="ui-input">
+            <select wire:model.live="status" class="ui-select">
                 <option value="">All Status</option>
                 @foreach (['pending', 'assigned', 'confirmed', 'completed', 'cancelled'] as $item)
                     <option value="{{ $item }}">{{ strtoupper($item) }}</option>
                 @endforeach
             </select>
-            <input wire:model.live="startDateFrom" type="date" class="rounded-md border-slate-300 text-sm">
-            <input wire:model.live="startDateTo" type="date" class="rounded-md border-slate-300 text-sm">
-            <div class="flex items-center justify-end">
-                @can('bookings.create')
-                    <a href="{{ route('bookings.create') }}" class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white">+ Booking</a>
-                @endcan
+            <input wire:model.live="startDateFrom" type="date" class="ui-input">
+            <input wire:model.live="startDateTo" type="date" class="ui-input">
+            <div class="flex items-end justify-end">
+                <x-ui.action-button :href="route('bookings.index')" variant="ghost">Reset</x-ui.action-button>
             </div>
         </div>
-    </section>
+    </x-ui.form-card>
 
-    <section class="rounded-lg border border-slate-200 bg-white">
+    <x-ui.table-card title="Booking List" description="Operational view of booking demand and current dispatch status.">
         @if ($bookings->count() === 0)
-            <p class="p-6 text-sm text-slate-500">No bookings found.</p>
+            <div class="p-5">
+                <x-ui.empty-state title="No bookings found" description="Try adjusting the filters or create a new booking to start the pipeline." />
+            </div>
         @else
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-slate-50">
+            <div class="ui-table-wrap">
+                <table class="ui-table">
+                    <thead>
                     <tr>
-                        <th class="px-4 py-3 text-left">Booking</th>
-                        <th class="px-4 py-3 text-left">Client</th>
-                        <th class="px-4 py-3 text-left">Pool</th>
-                        <th class="px-4 py-3 text-left">Start</th>
-                        <th class="px-4 py-3 text-left">Status</th>
-                        <th class="px-4 py-3 text-right">Action</th>
+                        <th>Booking</th>
+                        <th>Client</th>
+                        <th>Pool</th>
+                        <th>Start</th>
+                        <th>Status</th>
+                        <th class="text-right">Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach ($bookings as $booking)
-                        <tr class="border-t">
-                            <td class="px-4 py-3 font-medium">{{ $booking->booking_number }}</td>
-                            <td class="px-4 py-3">{{ $booking->client?->name ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $booking->pool?->name ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $booking->start_datetime?->format('Y-m-d H:i') }}</td>
-                            <td class="px-4 py-3"><span class="rounded-full bg-slate-100 px-2 py-1 text-xs uppercase text-slate-700">{{ $booking->status }}</span></td>
-                            <td class="px-4 py-3 text-right"><a href="{{ route('bookings.show', $booking) }}" class="text-blue-600">Detail</a></td>
+                        <tr>
+                            <td>
+                                <p class="font-semibold text-slate-900">{{ $booking->booking_number }}</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ $booking->end_datetime?->format('Y-m-d H:i') ? 'Ends '.$booking->end_datetime?->format('Y-m-d H:i') : 'No end schedule' }}</p>
+                            </td>
+                            <td>{{ $booking->client?->name ?? '-' }}</td>
+                            <td>{{ $booking->pool?->name ?? '-' }}</td>
+                            <td>{{ $booking->start_datetime?->format('Y-m-d H:i') }}</td>
+                            <td><x-ui.status-badge :status="$booking->status" /></td>
+                            <td class="text-right"><a href="{{ route('bookings.show', $booking) }}" class="ui-link">Open Detail</a></td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
             </div>
-            <div class="p-4">{{ $bookings->links() }}</div>
+            <div class="border-t border-slate-200/80 px-4 py-4">{{ $bookings->links() }}</div>
         @endif
-    </section>
+    </x-ui.table-card>
 </x-layouts.app>
