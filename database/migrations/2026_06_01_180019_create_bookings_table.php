@@ -14,8 +14,8 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('requested_by')->nullable()->constrained('users')->cascadeOnUpdate()->nullOnDelete();
             $table->foreignId('pool_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
-            $table->foreignId('vehicle_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
-            $table->foreignId('driver_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->unsignedBigInteger('vehicle_id')->nullable();
+            $table->unsignedBigInteger('driver_id')->nullable();
             $table->dateTime('start_datetime');
             $table->dateTime('end_datetime');
             $table->text('pickup_location')->nullable();
@@ -23,6 +23,9 @@ return new class extends Migration
             $table->enum('status', ['pending', 'assigned', 'confirmed', 'completed', 'cancelled'])->default('pending');
             $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index('vehicle_id');
+            $table->index('driver_id');
         });
     }
 

@@ -25,7 +25,6 @@ Minimum variables:
 - `APP_DEBUG=false`
 - `APP_URL=`
 - `LOG_CHANNEL=stderr`
-- `LOG_STDERR_FORMATTER=Monolog\\Formatter\\JsonFormatter`
 - `DB_CONNECTION=mysql`
 - `DB_HOST=`
 - `DB_PORT=3306`
@@ -61,7 +60,8 @@ This script will:
 
 - clear config, route, and view cache
 - run migrations with `--force`
-- optionally run demo seed only if `ENABLE_DEMO_SEED=true`
+- refresh RBAC baseline safely on each deploy
+- only seed demo data when `ENABLE_DEMO_SEED=true` and the `clients` table is still empty
 - support `DEMO_SEED_MODE=demo` for curated walkthrough data
 - support `DEMO_SEED_MODE=stress` for larger performance-oriented demo data
 - rebuild production caches
@@ -75,6 +75,27 @@ Recommended values:
 - production without demo data: `ENABLE_DEMO_SEED=false`
 
 When `DEMO_SEED_MODE=stress` and `DEMO_CUSTOMER_COUNT` is empty, the seeder defaults to 1200 clients.
+
+## First Demo Reset Command
+
+If a demo database was left half-migrated or half-seeded from a failed deploy, do a one-time manual reset:
+
+```bash
+railway run --service web -- php artisan migrate:fresh --seed --force
+```
+
+Use this only for a disposable demo environment.
+Do not keep `migrate:fresh` in permanent Railway startup or pre-deploy scripts.
+
+## Normal Deploy Behavior
+
+Normal deploys should keep using:
+
+```bash
+php artisan migrate --force
+```
+
+That keeps Railway startup deterministic and avoids dropping production or long-lived demo data on every deploy.
 
 ## First Deploy
 

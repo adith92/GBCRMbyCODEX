@@ -2,107 +2,72 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-5.1-UI-POLISH-RAILWAY-PREP-COMPLETE  
+**Checkpoint ID:** PHASE-5.2-RAILWAY-DEPLOYED  
 **Date:** 2026-06-02  
 **Status:** Completed  
 **Branch:** main
 
-## UI Polish Summary
+## Deployment Result
 
-- Introduced reusable UI Blade components for:
-  - stat cards
-  - status badges
-  - page headers
-  - empty states
-  - action buttons
-  - table cards
-  - form cards
-- Refreshed the base layout with:
-  - cleaner topbar
-  - enterprise-style sidebar
-  - clearer active states
-  - responsive sidebar behavior
-  - more consistent content width and spacing
-- Polished demo-priority pages:
-  - dashboard
-  - bookings index/create/show
-  - pool queue
-  - finance dashboard
-  - purchase order index
-  - invoice index/show
-  - e-voucher index
-  - client detail
-  - vehicle detail
-  - maintenance index
-  - HR driver admin page
-- Applied a Bluebird-inspired visual direction using corporate blue, restrained neutral surfaces, and clearer state hierarchy for finance, fleet, and maintenance statuses.
+- Railway project: `GBCRMbyCODEX`
+- Railway environment: `production`
+- Railway public URL: `https://web-production-c81b8.up.railway.app`
+- App service: `web`
+- Database service: `MySQL`
 
-## Railway Prep Files
+## What Was Fixed
 
-Added deployment prep assets:
+- Aligned Railway runtime to PHP 8.4 so it matches the current lockfile and Symfony package requirements.
+- Removed the problematic `LOG_STDERR_FORMATTER` deployment env usage that caused Monolog redeclare crashes.
+- Stabilized Railway startup flow so it uses:
+  - `php artisan migrate --force`
+  - `php artisan db:seed --class=RbacSeeder --force`
+  - demo seeding only when `ENABLE_DEMO_SEED=true` and the `clients` table is still empty
+- Fixed migration bootstrap ordering issues that broke clean database initialization:
+  - `client_contacts`
+  - `bookings`
+  - `driver_assignments`
+- Added deferred foreign-key migration so fresh database setup works deterministically on Railway and on manual demo resets.
+- Performed a one-time manual demo database reset using the public Railway MySQL proxy so the demo environment could be initialized cleanly.
 
-- `railway/init-app.sh`
-- `railway/run-worker.sh`
-- `railway/run-cron.sh`
-- `.env.railway.example`
-- `docs/RAILWAY_DEPLOYMENT.md`
-- `nixpacks.toml`
+## Railway Startup Rules
 
-Updated docs:
+Permanent startup behavior now follows these rules:
 
-- `README.md` with Railway deployment section, build/pre-deploy guidance, smoke test checklist, and scalable demo seed configuration
+- normal deploys use `php artisan migrate --force`
+- RBAC baseline can be refreshed safely on deploy
+- demo seed only runs when explicitly enabled and when demo tables are still empty
+- `migrate:fresh` is not used in permanent Railway startup
 
-## Scalable Demo Seeder Update
+## Smoke Test Result
 
-Added scalable demo seed support:
+Verified against the live Railway URL:
 
-- `ENABLE_DEMO_SEED=true|false`
-- `DEMO_SEED_MODE=demo|stress`
-- `DEMO_CUSTOMER_COUNT=<integer>`
+- `GET /login` -> `200`
+- `superadmin@blueerp.test / password` login -> redirect to `/dashboard`
+- `GET /dashboard` as super-admin -> `200`
+- `GET /crm/clients` as super-admin -> `200`
+- `GET /fleet/vehicles` as super-admin -> `200`
+- `GET /drivers` as super-admin -> `200`
+- `GET /bookings` as super-admin -> `200`
+- `GET /pool/queue` as super-admin -> `200`
+- `GET /finance` as super-admin -> `200`
+- `GET /maintenance` as super-admin -> `200`
+- `GET /admin/hr/drivers` as super-admin -> `200`
+- `GET /admin/hr/drivers` as finance user -> `403`
 
-Behavior summary:
+## Deployment Notes
 
-- `demo` mode keeps curated walkthrough data and now supports roughly 10-50 demo clients.
-- `stress` mode generates larger searchable data with a default effective size of 1200 clients when `DEMO_CUSTOMER_COUNT` is not set.
-- Added search-oriented indexes for clients and drivers through a new migration.
-- Added seeder coverage tests for demo mode, stress mode, and client index search/pagination behavior.
-
-## Validation Result
-
-Validation attempted for this checkpoint update:
-
-1. `php -l database/seeders/DemoDataSeeder.php`
-   - Passed.
-2. `php -l database/migrations/2026_06_02_120000_add_search_indexes_to_core_demo_tables.php`
-   - Passed.
-3. `php -l tests/Feature/ScalableDemoSeederTest.php`
-   - Passed.
-4. `php -l tests/Feature/CoreDatabaseSchemaTest.php`
-   - Passed.
-5. `php artisan optimize:clear`
-   - Started and produced partial output.
-   - Environment did not return a clean completion signal afterward and the process had to be stopped.
-6. `php artisan migrate:fresh --seed`
-   - Not attempted after the runtime hang pattern reappeared on `optimize:clear`.
-7. `npm run build`
-   - Not attempted in this pass because the runtime was already showing the same incomplete completion pattern.
-8. `php artisan test`
-   - Not attempted in this pass because the runtime was already showing the same incomplete completion pattern.
-
-Notes:
-
-- This checkpoint update does **not** claim fresh full validation passing.
-- The last previously recorded green baseline remains the earlier `82 tests passed` record from the stable validation run before the subsequent deployment-prep changes.
-- Railway deploy is now in progress.
-- PHP 8.4 runtime alignment has been identified and fixed in local deployment config.
-- Railway migration startup is still pending deterministic stabilization before `PHASE-5.2` can be claimed complete.
+- Demo accounts are available because RBAC and demo seed data are now present in the Railway database.
+- `APP_URL` is set to the generated Railway domain.
+- Deployment finished successfully after runtime, logging, and migration-order stabilization.
 
 ## Known TODO
 
-- Re-run full Laravel and frontend validation in a runtime session that returns clean completion signals.
-- Complete Railway startup stabilization so migrations and demo seeding run deterministically.
-- Rename local folder to `GBCRMbyCODEX` only after deployment flow is safely completed.
+- Run a broader end-to-end browser pass over booking, finance, maintenance, and logout flow on the live deployment.
+- Optionally add a safer first-class deploy config for Railway pre-deploy/start settings if future infra automation needs to be fully codified.
+- Rename local folder to `GBCRMbyCODEX` after this deployment checkpoint is fully recorded.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 5.2 — Railway Deployment** after stable startup and smoke test confirmation are available.
+Proceed to **Post-Deployment QA / UI Polish Follow-up** or **Folder Rename + Repo Hygiene**.

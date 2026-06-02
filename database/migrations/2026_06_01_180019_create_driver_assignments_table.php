@@ -10,15 +10,19 @@ return new class extends Migration
     {
         Schema::create('driver_assignments', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('booking_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('vehicle_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreignId('driver_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->unsignedBigInteger('booking_id');
+            $table->unsignedBigInteger('vehicle_id');
+            $table->unsignedBigInteger('driver_id');
             $table->enum('assignment_type', ['primary', 'substitute', 'temporary'])->default('primary');
             $table->foreignId('assigned_by')->nullable()->constrained('users')->cascadeOnUpdate()->nullOnDelete();
             $table->text('reason')->nullable();
             $table->dateTime('assigned_at');
             $table->dateTime('released_at')->nullable();
             $table->timestamps();
+
+            $table->index('booking_id');
+            $table->index('vehicle_id');
+            $table->index('driver_id');
         });
     }
 

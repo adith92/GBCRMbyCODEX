@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('client_contacts', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('client_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->unsignedBigInteger('client_id');
             $table->string('name');
             $table->string('position')->nullable();
             $table->string('phone')->nullable();
@@ -18,6 +18,8 @@ return new class extends Migration
             $table->boolean('is_primary')->default(false);
             $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index('client_id');
         });
     }
 
