@@ -58,6 +58,8 @@ class ClientController extends Controller
         $client->load([
             'contacts',
             'meetingLogs' => fn ($query) => $query->latest()->limit(10),
+            'bookings' => fn ($query) => $query->latest()->limit(10),
+            'invoices' => fn ($query) => $query->latest()->limit(10),
         ]);
 
         return view('clients.show', compact('client'));

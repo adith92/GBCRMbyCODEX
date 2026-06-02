@@ -15,7 +15,17 @@ class Show extends Component
     public function mount(Booking $booking): void
     {
         abort_unless(auth()->user()->can('bookings.view'), 403);
-        $this->booking = $booking->load(['client', 'pool', 'vehicle', 'driver', 'requestedBy', 'driverAssignments.driver', 'driverAssignments.vehicle', 'driverAssignments.assignedBy']);
+        $this->booking = $booking->load([
+            'client',
+            'pool',
+            'vehicle',
+            'driver',
+            'requestedBy',
+            'purchaseOrders.invoices',
+            'driverAssignments.driver',
+            'driverAssignments.vehicle',
+            'driverAssignments.assignedBy',
+        ]);
     }
 
     public function confirm(BookingDispatchService $dispatchService): void

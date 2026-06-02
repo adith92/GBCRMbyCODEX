@@ -1,4 +1,10 @@
 <x-layouts.app :title="'Client Detail'" :header="'Client Detail'">
+    <x-breadcrumbs :items="[
+        ['label' => 'CRM', 'url' => route('crm.index')],
+        ['label' => 'Clients', 'url' => route('crm.clients.index')],
+        ['label' => $client->name, 'url' => route('crm.clients.show', $client)],
+    ]" />
+
     <section class="rounded-lg border border-slate-200 bg-white p-4 text-sm">
         <div class="grid gap-2 md:grid-cols-2">
             <p><strong>Name:</strong> {{ $client->name }}</p><p><strong>Legal Name:</strong> {{ $client->legal_name ?: '-' }}</p>
@@ -9,7 +15,7 @@
         <div class="mt-4 flex gap-2">
             @can('clients.update')<a href="{{ route('crm.clients.edit', $client) }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm">Edit</a>@endcan
             @can('clients.delete')<form method="POST" action="{{ route('crm.clients.destroy', $client) }}" onsubmit="return confirm('Delete this client?')">@csrf @method('DELETE')<button class="rounded-md border border-red-300 px-3 py-2 text-sm text-red-600">Delete</button></form>@endcan
-            <a href="{{ route('crm.clients.index') }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm">Back</a>
+            <x-back-link :fallback="route('crm.clients.index')" />
         </div>
     </section>
 
@@ -65,5 +71,33 @@
             <button class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white md:col-span-2">Add Meeting Log</button>
         </form>
         @endcan
+    </section>
+
+    <section class="rounded-lg border border-slate-200 bg-white p-4">
+        <h3 class="text-base font-semibold">Booking History</h3>
+        <div class="mt-3 space-y-2 text-sm">
+            @forelse($client->bookings as $booking)
+                <a href="{{ route('bookings.show', $booking) }}" class="block rounded border p-3 hover:bg-slate-50">
+                    {{ $booking->booking_number }}
+                    <span class="float-right uppercase text-xs">{{ $booking->status }}</span>
+                </a>
+            @empty
+                <p class="text-slate-500">No booking history yet.</p>
+            @endforelse
+        </div>
+    </section>
+
+    <section class="rounded-lg border border-slate-200 bg-white p-4">
+        <h3 class="text-base font-semibold">Invoices</h3>
+        <div class="mt-3 space-y-2 text-sm">
+            @forelse($client->invoices as $invoice)
+                <a href="{{ route('finance.invoices.show', $invoice) }}" class="block rounded border p-3 hover:bg-slate-50">
+                    {{ $invoice->invoice_number }}
+                    <span class="float-right uppercase text-xs">{{ $invoice->status }}</span>
+                </a>
+            @empty
+                <p class="text-slate-500">No invoices yet.</p>
+            @endforelse
+        </div>
     </section>
 </x-layouts.app>

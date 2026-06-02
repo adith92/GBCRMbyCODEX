@@ -2,93 +2,31 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-2.2-FINANCE-FLOW-COMPLETE  
+**Checkpoint ID:** PHASE-4.1-DEMO-READY  
 **Date:** 2026-06-02  
 **Status:** Completed  
 **Branch:** main
 
 ## Completed Tasks
 
-- Implemented Finance Dashboard mini at `/finance` (Livewire):
-  - total invoice sent/partial/overdue amount
-  - total paid amount
-  - outstanding amount
-  - overdue invoice count
-  - latest payments
-  - latest invoices
-- Implemented Purchase Order module (Livewire + routes):
-  - `/finance/purchase-orders`
-  - `/finance/purchase-orders/create`
-  - `/finance/purchase-orders/{purchaseOrder}`
-  - `/finance/purchase-orders/{purchaseOrder}/edit`
-  - features:
-    - list with search/filter status/client
-    - create PO only from confirmed booking
-    - PO number auto format `PO-YYYYMM-0001`
-    - subtotal/tax/total
-    - status flow: draft, pending, approved, invoiced, cancelled
-    - approve action updates `approved_by`, `approved_at`, and status `approved`
-- Implemented Invoice module (Livewire + routes):
-  - `/finance/invoices`
-  - `/finance/invoices/{invoice}`
-  - features:
-    - generate invoice from approved PO via PO detail page
-    - invoice number auto format `INV-YYYYMM-0001`
-    - status creation mode: draft or sent
-    - issued_at, due_at
-    - subtotal/tax/total copied from PO
-    - paid_amount default 0
-    - status model: draft, sent, partial, paid, overdue, cancelled
-  - business rules enforced:
-    - one PO only one active invoice
-    - PO status becomes `invoiced` after invoice creation
-    - invoice cannot be created from unapproved PO
-- Implemented Payment flow in invoice detail:
-  - payment form embedded on invoice show
-  - payment number auto format `PAY-YYYYMM-0001`
-  - fields: paid_at, amount, method, reference_number, notes
-  - methods: bank_transfer, cash, evoucher, other
-  - business rules enforced:
-    - amount > 0
-    - no overpayment beyond invoice total
-    - invoice paid_amount updated after payment
-    - invoice status transitions:
-      - partial when paid_amount < total
-      - paid when paid_amount >= total
-- Implemented E-Voucher module basic (Livewire + routes):
-  - `/finance/e-vouchers`
-  - `/finance/e-vouchers/create`
-  - `/finance/e-vouchers/{eVoucher}`
-  - features:
-    - code auto format `EV-YYYYMM-0001`
-    - optional client
-    - amount, used_amount, expired_at, status
-  - business rules enforced:
-    - e-voucher payment requires voucher selection
-    - voucher must be active and not expired
-    - voucher remaining amount must be sufficient
-    - used_amount updated on evoucher payment
-    - status auto becomes `used` when fully consumed
-- Added finance services:
-  - `DocumentNumberService` for PO/INV/PAY/EV numbering
-  - `FinanceFlowService` for PO/Invoice/Payment/E-Voucher business flow
-- Added DB update:
-  - new migration adds `payments.e_voucher_id` relation
-- Sidebar finance navigation expanded and permission-aware:
-  - Finance Dashboard
-  - Purchase Orders
-  - Invoices
-  - E-Vouchers
-- Route/action permission guards enforced for:
-  - `purchase-orders.view`
-  - `purchase-orders.create`
-  - `purchase-orders.approve`
-  - `invoices.view`
-  - `invoices.create`
-  - `invoices.update`
-  - `payments.create`
-  - `evouchers.view`
-  - `evouchers.create`
+- Completed **Checkpoint 3.1 — Operations, Maintenance, Dashboard, Drill-down**:
+  - Added Maintenance module with index/create/edit/show screens.
+  - Enforced maintenance business flow so active maintenance marks vehicle `maintenance` and completed maintenance can release it back to `available`.
+  - Blocked vehicle assignment for vehicles under active maintenance.
+  - Added HR backend-only placeholder pages for drivers, attendance, and license monitoring under `/admin/hr`.
+  - Enforced HR visibility and access for super-admin only.
+  - Expanded dashboard with operations-ready KPI blocks and drill-down navigation.
+  - Added booking -> client, client -> booking/invoice, and invoice -> client/PO cross-links.
+  - Added reusable breadcrumbs and back-link components for navigation consistency.
+
+- Completed **Checkpoint 4.1 — Demo Ready**:
+  - Seeded realistic demo data for pools, vehicles, drivers, clients, contacts, bookings, dispatch, invoices, payments, vouchers, maintenance, and attendance.
+  - Added demo documentation:
+    - `docs/DEMO_SCRIPT_PAK_KOBI.md`
+    - `docs/QA_CHECKLIST.md`
+  - Stabilized frontend asset build for this environment with a deterministic build script that generates hashed CSS/JS assets and manifest without the previous hanging runtime behavior.
+  - Simplified app bootstrap JS so Livewire-provided Alpine remains the single interactive runtime source.
+  - Preserved existing Laravel + Livewire + Tailwind + Spatie Permission stack and planning documents.
 
 ## Validation Result
 
@@ -101,14 +39,19 @@ Executed successfully:
 5. `npm run build`
 6. `php artisan test`
 
-Result: **70 tests passed, 0 failed**.
+Result: **82 tests passed, 0 failed**.
 
 ## Known TODO
 
-- Add dedicated standalone payments index/report screen (currently payment flow is via invoice detail as required).
-- Add richer finance export/report capability in reporting phase.
-- Add stricter audit trail/event logs for finance status transitions in upcoming phase.
+- Apply final Google Stitch visual polish after business modules are considered stable.
+- Add deployment-specific environment hardening before production release.
+- Add broader reports/export drill-down and operational analytics in the next phase.
+- Consider revisiting Vite/Tailwind runtime compatibility separately if local dev asset workflow needs to return to a standard Vite production build path.
+
+## Deploy Recommendation
+
+Recommended deployment target: **Railway**.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 3.1 — Operations, Maintenance, Dashboard, Drill-down**.
+Proceed to **Google Stitch UI polish + Railway deployment**.

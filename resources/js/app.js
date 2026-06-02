@@ -1,7 +1,2 @@
-import './bootstrap';
-
-import Alpine from 'alpinejs';
-
-window.Alpine = Alpine;
-
-Alpine.start();
+// Livewire v3 already boots Alpine for interactive components.
+document.documentElement.classList.add('js');

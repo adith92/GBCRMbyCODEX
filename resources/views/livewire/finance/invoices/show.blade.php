@@ -1,19 +1,31 @@
 <x-layouts.app :title="'Invoice Detail'" :header="'Finance / Invoices / Detail'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Finance', 'url' => route('finance.index')],
+        ['label' => 'Invoices', 'url' => route('finance.invoices.index')],
+        ['label' => $invoice->invoice_number, 'url' => route('finance.invoices.show', $invoice)],
+    ]" />
+
     @if($errorMessage)<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errorMessage }}</div>@endif
     <section class="rounded-lg border bg-white p-4 text-sm">
         <div class="grid gap-2 md:grid-cols-2">
             <p><strong>Invoice:</strong> {{ $invoice->invoice_number }}</p>
             <p><strong>Status:</strong> <span class="uppercase text-xs">{{ $invoice->status }}</span></p>
-            <p><strong>PO:</strong> {{ $invoice->purchaseOrder?->po_number }}</p>
-            <p><strong>Client:</strong> {{ $invoice->client?->name }}</p>
+            <p><strong>PO:</strong> @if($invoice->purchaseOrder)<a href="{{ route('finance.purchase-orders.show', $invoice->purchaseOrder) }}" class="text-blue-600 hover:underline">{{ $invoice->purchaseOrder->po_number }}</a>@else - @endif</p>
+            <p><strong>Client:</strong> @if($invoice->client)<a href="{{ route('crm.clients.show', $invoice->client) }}" class="text-blue-600 hover:underline">{{ $invoice->client->name }}</a>@else - @endif</p>
             <p><strong>Issued At:</strong> {{ $invoice->issued_at?->format('Y-m-d') }}</p>
             <p><strong>Due At:</strong> {{ $invoice->due_at?->format('Y-m-d') }}</p>
             <p><strong>Total:</strong> {{ number_format($invoice->total,2) }}</p>
             <p><strong>Paid Amount:</strong> {{ number_format($invoice->paid_amount,2) }}</p>
         </div>
+        @if($invoice->purchaseOrder?->booking)
+            <p class="mt-3"><strong>Booking:</strong> <a href="{{ route('bookings.show', $invoice->purchaseOrder->booking) }}" class="text-blue-600 hover:underline">{{ $invoice->purchaseOrder->booking->booking_number }}</a></p>
+        @endif
         @if($invoice->status === 'draft' && auth()->user()->can('invoices.update'))
             <div class="mt-4"><button wire:click="markSent" class="rounded bg-slate-900 px-3 py-2 text-sm text-white">Mark as Sent</button></div>
         @endif
+        <div class="mt-4">
+            <x-back-link :fallback="route('finance.invoices.index')" />
+        </div>
     </section>
 
     <section class="rounded-lg border bg-white p-4">

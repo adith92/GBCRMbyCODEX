@@ -39,4 +39,9 @@ class MaintenanceLog extends Model
     {
         return $this->belongsTo(User::class, 'reported_by');
     }
+
+    public function isActive(): bool
+    {
+        return in_array($this->status, ['scheduled', 'in_progress'], true);
+    }
 }

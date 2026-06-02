@@ -16,6 +16,7 @@ class EVoucherFactory extends Factory
     public function definition(): array
     {
         $amount = fake()->randomFloat(2, 50000, 2000000);
+        $expiredAt = fake()->optional()->dateTimeBetween('+1 month', '+1 year');
 
         return [
             'code' => strtoupper(fake()->unique()->bothify('EVC-########')),
@@ -23,7 +24,7 @@ class EVoucherFactory extends Factory
             'status' => fake()->randomElement(['active', 'used', 'expired', 'cancelled']),
             'amount' => $amount,
             'used_amount' => fake()->randomFloat(2, 0, $amount),
-            'expired_at' => fake()->optional()->dateTimeBetween('+1 month', '+1 year')->format('Y-m-d'),
+            'expired_at' => $expiredAt?->format('Y-m-d'),
             'used_at' => fake()->optional()->dateTimeBetween('-3 months', 'now'),
         ];
     }

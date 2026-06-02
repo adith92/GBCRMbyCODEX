@@ -24,7 +24,7 @@ class Show extends Component
     {
         abort_unless(auth()->user()->can('invoices.view'), 403);
 
-        $this->invoice = $invoice->load(['client', 'purchaseOrder', 'payments.createdBy', 'payments.eVoucher']);
+        $this->invoice = $invoice->load(['client', 'purchaseOrder.booking', 'payments.createdBy', 'payments.eVoucher']);
         $this->paid_at = now()->toDateString();
     }
 
@@ -55,7 +55,7 @@ class Show extends Component
 
         try {
             $service->addPayment($this->invoice, $validated, (int) auth()->id());
-            $this->invoice->refresh()->load(['client', 'purchaseOrder', 'payments.createdBy', 'payments.eVoucher']);
+            $this->invoice->refresh()->load(['client', 'purchaseOrder.booking', 'payments.createdBy', 'payments.eVoucher']);
             $this->amount = 0;
             $this->reference_number = null;
             $this->notes = null;

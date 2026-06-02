@@ -31,6 +31,7 @@ class BookingPoolDispatchTest extends TestCase
     {
         $user = User::query()->where('email', 'sales@blueerp.test')->firstOrFail();
         $client = Client::query()->firstOrFail();
+        $before = Booking::query()->count();
 
         Livewire::actingAs($user)
             ->test(BookingCreate::class)
@@ -39,7 +40,7 @@ class BookingPoolDispatchTest extends TestCase
             ->set('end_datetime', now()->addDays(2)->format('Y-m-d\TH:i'))
             ->call('save');
 
-        $this->assertDatabaseCount('bookings', 9);
+        $this->assertSame($before + 1, Booking::query()->count());
     }
 
     public function test_booking_number_auto_generated(): void

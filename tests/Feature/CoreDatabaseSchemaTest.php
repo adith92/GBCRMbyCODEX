@@ -49,7 +49,11 @@ class CoreDatabaseSchemaTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
 
-        $booking = Booking::query()->with(['client', 'vehicle', 'driver'])->firstOrFail();
+        $booking = Booking::query()
+            ->with(['client', 'vehicle', 'driver'])
+            ->whereNotNull('vehicle_id')
+            ->whereNotNull('driver_id')
+            ->firstOrFail();
 
         $this->assertNotNull($booking->client);
         $this->assertNotNull($booking->vehicle);

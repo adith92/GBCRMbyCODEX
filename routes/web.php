@@ -6,6 +6,9 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\MeetingLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VehicleController;
+use App\Livewire\Admin\Hr\Attendance as HrAttendance;
+use App\Livewire\Admin\Hr\Drivers as HrDrivers;
+use App\Livewire\Admin\Hr\Licenses as HrLicenses;
 use App\Livewire\Bookings\Create as BookingCreate;
 use App\Livewire\Bookings\Edit as BookingEdit;
 use App\Livewire\Bookings\Index as BookingIndex;
@@ -20,6 +23,10 @@ use App\Livewire\Finance\PurchaseOrders\Create as PurchaseOrderCreate;
 use App\Livewire\Finance\PurchaseOrders\Edit as PurchaseOrderEdit;
 use App\Livewire\Finance\PurchaseOrders\Index as PurchaseOrderIndex;
 use App\Livewire\Finance\PurchaseOrders\Show as PurchaseOrderShow;
+use App\Livewire\Maintenance\Create as MaintenanceCreate;
+use App\Livewire\Maintenance\Edit as MaintenanceEdit;
+use App\Livewire\Maintenance\Index as MaintenanceIndex;
+use App\Livewire\Maintenance\Show as MaintenanceShow;
 use App\Livewire\Pool\AssignBooking;
 use App\Livewire\Pool\Queue as PoolQueue;
 use Illuminate\Support\Facades\Route;
@@ -41,10 +48,10 @@ Route::middleware('auth')->group(function () {
             ->name('index');
 
         Route::resource('clients', ClientController::class)
-            ->middleware('permission:clients.view', ['only' => ['index', 'show']])
-            ->middleware('permission:clients.create', ['only' => ['create', 'store']])
-            ->middleware('permission:clients.update', ['only' => ['edit', 'update']])
-            ->middleware('permission:clients.delete', ['only' => ['destroy']]);
+            ->middlewareFor(['index', 'show'], 'permission:clients.view')
+            ->middlewareFor(['create', 'store'], 'permission:clients.create')
+            ->middlewareFor(['edit', 'update'], 'permission:clients.update')
+            ->middlewareFor(['destroy'], 'permission:clients.delete');
 
         Route::post('clients/{client}/contacts', [ClientContactController::class, 'store'])
             ->middleware('permission:clients.update')
@@ -67,17 +74,17 @@ Route::middleware('auth')->group(function () {
             ->name('index');
 
         Route::resource('vehicles', VehicleController::class)
-            ->middleware('permission:vehicles.view', ['only' => ['index', 'show']])
-            ->middleware('permission:vehicles.create', ['only' => ['create', 'store']])
-            ->middleware('permission:vehicles.update', ['only' => ['edit', 'update']])
-            ->middleware('permission:vehicles.delete', ['only' => ['destroy']]);
+            ->middlewareFor(['index', 'show'], 'permission:vehicles.view')
+            ->middlewareFor(['create', 'store'], 'permission:vehicles.create')
+            ->middlewareFor(['edit', 'update'], 'permission:vehicles.update')
+            ->middlewareFor(['destroy'], 'permission:vehicles.delete');
     });
 
     Route::resource('/drivers', DriverController::class)
-        ->middleware('permission:drivers.view', ['only' => ['index', 'show']])
-        ->middleware('permission:drivers.create', ['only' => ['create', 'store']])
-        ->middleware('permission:drivers.update', ['only' => ['edit', 'update']])
-        ->middleware('permission:drivers.delete', ['only' => ['destroy']]);
+        ->middlewareFor(['index', 'show'], 'permission:drivers.view')
+        ->middlewareFor(['create', 'store'], 'permission:drivers.create')
+        ->middlewareFor(['edit', 'update'], 'permission:drivers.update')
+        ->middlewareFor(['destroy'], 'permission:drivers.delete');
 
     Route::get('/bookings', BookingIndex::class)
         ->middleware('permission:bookings.view')
@@ -126,10 +133,12 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    Route::view('/maintenance', 'module-placeholder', [
-        'header' => 'Maintenance Module',
-        'message' => 'Checkpoint placeholder. Maintenance workflows start in Phase 3.1.',
-    ])->middleware('permission:maintenance.view')->name('maintenance.index');
+    Route::prefix('/maintenance')->name('maintenance.')->group(function (): void {
+        Route::get('/', MaintenanceIndex::class)->middleware('permission:maintenance.view')->name('index');
+        Route::get('/create', MaintenanceCreate::class)->middleware('permission:maintenance.create')->name('create');
+        Route::get('/{maintenanceLog}', MaintenanceShow::class)->middleware('permission:maintenance.view')->name('show');
+        Route::get('/{maintenanceLog}/edit', MaintenanceEdit::class)->middleware('permission:maintenance.update')->name('edit');
+    });
 
     Route::view('/reports', 'module-placeholder', [
         'header' => 'Reports Module',
@@ -137,10 +146,10 @@ Route::middleware('auth')->group(function () {
     ])->middleware('permission:reports.view')->name('reports.index');
 
     Route::prefix('/admin/hr')->name('admin.hr.')->middleware('role:super-admin')->group(function (): void {
-        Route::view('/', 'module-placeholder', [
-            'header' => 'HR Admin Module',
-            'message' => 'Checkpoint placeholder. HR backend-only module starts in Phase 3.1.',
-        ])->name('index');
+        Route::get('/', fn () => redirect()->route('admin.hr.drivers'))->name('index');
+        Route::get('/drivers', HrDrivers::class)->name('drivers');
+        Route::get('/attendance', HrAttendance::class)->name('attendance');
+        Route::get('/licenses', HrLicenses::class)->name('licenses');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

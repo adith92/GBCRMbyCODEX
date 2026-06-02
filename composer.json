@@ -52,6 +52,7 @@
             "@php artisan test"
         ],
         "post-autoload-dump": [
+            "@php scripts/fix-composer-autoload.php",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
@@ -76,7 +77,7 @@
         }
     },
     "config": {
-        "optimize-autoloader": true,
+        "optimize-autoloader": false,
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {

@@ -1,4 +1,10 @@
 <x-layouts.app :title="'Booking Detail'" :header="'Bookings / Detail'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Bookings', 'url' => route('bookings.index')],
+        ['label' => $booking->booking_number, 'url' => route('bookings.show', $booking)],
+    ]" />
+
     @if ($errorMessage)
         <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errorMessage }}</div>
     @endif
@@ -7,10 +13,10 @@
         <div class="grid gap-2 md:grid-cols-2">
             <p><strong>Booking Number:</strong> {{ $booking->booking_number }}</p>
             <p><strong>Status:</strong> <span class="rounded-full bg-slate-100 px-2 py-1 text-xs uppercase">{{ $booking->status }}</span></p>
-            <p><strong>Client:</strong> {{ $booking->client?->name ?? '-' }}</p>
+            <p><strong>Client:</strong> @if($booking->client)<a href="{{ route('crm.clients.show', $booking->client) }}" class="text-blue-600 hover:underline">{{ $booking->client->name }}</a>@else - @endif</p>
             <p><strong>Pool:</strong> {{ $booking->pool?->name ?? '-' }}</p>
-            <p><strong>Vehicle:</strong> {{ $booking->vehicle?->plate_number ?? '-' }}</p>
-            <p><strong>Driver:</strong> {{ $booking->driver?->name ?? '-' }}</p>
+            <p><strong>Vehicle:</strong> @if($booking->vehicle)<a href="{{ route('fleet.vehicles.show', $booking->vehicle) }}" class="text-blue-600 hover:underline">{{ $booking->vehicle->plate_number }}</a>@else - @endif</p>
+            <p><strong>Driver:</strong> @if($booking->driver)<a href="{{ route('drivers.show', $booking->driver) }}" class="text-blue-600 hover:underline">{{ $booking->driver->name }}</a>@else - @endif</p>
             <p><strong>Start:</strong> {{ $booking->start_datetime?->format('Y-m-d H:i') }}</p>
             <p><strong>End:</strong> {{ $booking->end_datetime?->format('Y-m-d H:i') }}</p>
         </div>
@@ -37,9 +43,37 @@
                     <button wire:click="cancel" wire:confirm="Cancel this booking?" class="rounded-md bg-red-600 px-3 py-2 text-sm text-white">Cancel</button>
                 @endif
             @endcan
-            <a href="{{ route('bookings.index') }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm">Back</a>
+            <x-back-link :fallback="route('bookings.index')" />
         </div>
     </section>
+
+    @if($booking->purchaseOrders->isNotEmpty())
+        <section class="rounded-lg border border-slate-200 bg-white p-4">
+            <h3 class="text-base font-semibold">Purchase Orders</h3>
+            <div class="mt-3 space-y-2 text-sm">
+                @foreach($booking->purchaseOrders as $purchaseOrder)
+                    <a href="{{ route('finance.purchase-orders.show', $purchaseOrder) }}" class="block rounded border p-3 hover:bg-slate-50">
+                        {{ $purchaseOrder->po_number }}
+                        <span class="float-right uppercase text-xs">{{ $purchaseOrder->status }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    @if($booking->purchaseOrders->flatMap->invoices->isNotEmpty())
+        <section class="rounded-lg border border-slate-200 bg-white p-4">
+            <h3 class="text-base font-semibold">Invoices</h3>
+            <div class="mt-3 space-y-2 text-sm">
+                @foreach($booking->purchaseOrders->flatMap->invoices as $invoice)
+                    <a href="{{ route('finance.invoices.show', $invoice) }}" class="block rounded border p-3 hover:bg-slate-50">
+                        {{ $invoice->invoice_number }}
+                        <span class="float-right uppercase text-xs">{{ $invoice->status }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+    @endif
 
     <section class="rounded-lg border border-slate-200 bg-white p-4">
         <h3 class="text-base font-semibold">Driver Assignment History</h3>

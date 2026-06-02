@@ -43,4 +43,14 @@ class Vehicle extends Model
     {
         return $this->hasMany(DriverAssignment::class);
     }
+
+    public function hasActiveBooking(): bool
+    {
+        return $this->bookings()->whereIn('status', ['assigned', 'confirmed'])->exists();
+    }
+
+    public function hasActiveMaintenance(): bool
+    {
+        return $this->maintenanceLogs()->whereIn('status', ['scheduled', 'in_progress'])->exists();
+    }
 }

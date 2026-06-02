@@ -30,7 +30,7 @@
                 ['label' => 'E-Vouchers', 'route' => 'finance.e-vouchers.index', 'permissions' => ['evouchers.view']],
                 ['label' => 'Maintenance', 'route' => 'maintenance.index', 'permissions' => ['maintenance.view']],
                 ['label' => 'Reports', 'route' => 'reports.index', 'permissions' => ['reports.view']],
-                ['label' => 'HR (Backend)', 'route' => 'admin.hr.index', 'permissions' => ['admin.access', 'hr.view'], 'all_required' => true],
+                ['label' => 'HR (Backend)', 'route' => 'admin.hr.drivers', 'permissions' => ['admin.access', 'hr.view'], 'all_required' => true],
             ];
         @endphp
 
