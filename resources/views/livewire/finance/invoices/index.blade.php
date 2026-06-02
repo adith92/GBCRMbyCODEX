@@ -1,4 +1,10 @@
 <x-layouts.app :title="'Invoices'" :header="'Finance / Invoices'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Finance', 'url' => route('finance.index')],
+        ['label' => 'Invoices', 'url' => route('finance.invoices.index')],
+    ]" />
+
     <x-ui.page-header title="Invoices" eyebrow="Finance" description="Monitor invoice status, collection risk, and customer exposure with clean drill-down access." />
 
     <x-ui.form-card title="Filter Invoices" description="Search by invoice number or narrow the list by invoice status.">
@@ -13,7 +19,7 @@
         @if($invoices->count()===0)
             <div class="p-5"><x-ui.empty-state title="No invoices found" description="Invoices will appear here after approved purchase orders are converted." /></div>
         @else
-            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>Invoice</th><th>Client</th><th>Status</th><th>Total</th><th class="text-right">Action</th></tr></thead><tbody>@foreach($invoices as $invoice)<tr><td><p class="font-semibold text-slate-900">{{ $invoice->invoice_number }}</p></td><td>{{ $invoice->client?->name }}</td><td><x-ui.status-badge :status="$invoice->status" /></td><td>{{ number_format($invoice->total,2) }}</td><td class="text-right"><a class="ui-link" href="{{ route('finance.invoices.show',$invoice) }}">Open Detail</a></td></tr>@endforeach</tbody></table></div>
+            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>Invoice</th><th>Client</th><th>Status</th><th>Total</th><th class="text-right">Action</th></tr></thead><tbody>@foreach($invoices as $invoice)<tr><td><p class="font-semibold text-slate-900">{{ $invoice->invoice_number }}</p></td><td>@if($invoice->client)<a class="ui-link" href="{{ route('crm.clients.show', $invoice->client) }}">{{ $invoice->client->name }}</a>@else - @endif</td><td><x-ui.status-badge :status="$invoice->status" /></td><td>{{ number_format($invoice->total,2) }}</td><td class="text-right"><a class="ui-link" href="{{ route('finance.invoices.show',$invoice) }}">Open Detail</a></td></tr>@endforeach</tbody></table></div>
             <div class="border-t border-slate-200/80 px-4 py-4">{{ $invoices->links() }}</div>
         @endif
     </x-ui.table-card>

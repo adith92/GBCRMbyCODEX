@@ -12,6 +12,12 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <section class="grid gap-4 md:grid-cols-3">
+        <x-ui.stat-card label="Current Pool" :value="$vehicle->pool?->name ?? '-'" hint="Pool ownership used by dispatch routing." tone="blue" />
+        <x-ui.stat-card label="Bookings Linked" :value="$vehicle->bookings->count()" hint="Historical booking linkage for this unit." tone="emerald" />
+        <x-ui.stat-card label="Maintenance Cases" :value="$vehicle->maintenanceLogs->count()" hint="Operational maintenance history for readiness tracking." tone="amber" />
+    </section>
+
     <x-ui.form-card title="Vehicle snapshot" description="Read-only fleet details used by dispatch and maintenance teams.">
         <dl class="ui-meta-grid">
             <div class="ui-meta-item"><dt>Plate</dt><dd>{{ $vehicle->plate_number }}</dd></div>

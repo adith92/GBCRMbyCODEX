@@ -1,36 +1,46 @@
 <x-layouts.app :title="'Vehicles'" :header="'Fleet / Vehicles'">
-    <section class="rounded-lg border border-slate-200 bg-white p-4">
-        <form method="GET" class="grid gap-3 md:grid-cols-4">
-            <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search plate/brand/model" class="rounded-md border-slate-300">
-            <select name="status" class="rounded-md border-slate-300"><option value="">All Status</option>@foreach(['available','po','maintenance','hold'] as $status)<option value="{{ $status }}" @selected(($filters['status'] ?? '')===$status)>{{ strtoupper($status) }}</option>@endforeach</select>
-            <select name="pool_id" class="rounded-md border-slate-300"><option value="">All Pool</option>@foreach($pools as $pool)<option value="{{ $pool->id }}" @selected(($filters['pool_id'] ?? '')==$pool->id)>{{ $pool->name }}</option>@endforeach</select>
-            <div class="flex gap-2"><button class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white">Filter</button>@can('vehicles.create')<a href="{{ route('fleet.vehicles.create') }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm">+ Vehicle</a>@endcan</div>
-        </form>
-    </section>
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Fleet', 'url' => route('fleet.index')],
+        ['label' => 'Vehicles', 'url' => route('fleet.vehicles.index')],
+    ]" />
 
-    <section class="rounded-lg border border-slate-200 bg-white">
+    <x-ui.page-header title="Fleet vehicles" eyebrow="Fleet" description="Track readiness, search units quickly, and move deeper into assignment or maintenance context.">
+        <x-slot:actions>
+            @can('vehicles.create')<x-ui.action-button :href="route('fleet.vehicles.create')" variant="primary">+ New Vehicle</x-ui.action-button>@endcan
+        </x-slot:actions>
+    </x-ui.page-header>
+
+    <x-ui.form-card title="Filter fleet" description="Search by identity, then narrow units by operational status and pool.">
+        <form method="GET" class="grid gap-3 md:grid-cols-4">
+            <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search plate/brand/model" class="ui-input">
+            <select name="status" class="ui-select"><option value="">All Status</option>@foreach(['available','po','maintenance','hold'] as $status)<option value="{{ $status }}" @selected(($filters['status'] ?? '')===$status)>{{ strtoupper($status) }}</option>@endforeach</select>
+            <select name="pool_id" class="ui-select"><option value="">All Pool</option>@foreach($pools as $pool)<option value="{{ $pool->id }}" @selected(($filters['pool_id'] ?? '')==$pool->id)>{{ $pool->name }}</option>@endforeach</select>
+            <div class="flex items-end justify-between gap-3"><x-ui.action-button type="submit" variant="primary">Apply Filter</x-ui.action-button><x-ui.action-button :href="route('fleet.vehicles.index')" variant="ghost">Reset</x-ui.action-button></div>
+        </form>
+    </x-ui.form-card>
+
+    <x-ui.table-card title="Vehicle list" description="Operational fleet view with drill-down into detail, booking history, and maintenance state.">
         @if($vehicles->count() === 0)
-            <p class="p-6 text-sm text-slate-500">No vehicles found.</p>
+            <div class="p-5"><x-ui.empty-state title="No vehicles found" description="Try broadening the filters or add a new vehicle to expand the fleet view." /></div>
         @else
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left">Plate</th><th class="px-4 py-3 text-left">Pool</th><th class="px-4 py-3 text-left">Vehicle</th><th class="px-4 py-3 text-left">Status</th><th class="px-4 py-3 text-right">Action</th></tr></thead>
+            <div class="ui-table-wrap">
+                <table class="ui-table">
+                    <thead><tr><th>Plate</th><th>Pool</th><th>Vehicle</th><th>Status</th><th class="text-right">Action</th></tr></thead>
                     <tbody>
                     @foreach($vehicles as $vehicle)
-                        <tr class="border-t">
-                            <td class="px-4 py-3 font-medium">{{ $vehicle->plate_number }}</td>
-                            <td class="px-4 py-3">{{ $vehicle->pool?->name ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $vehicle->brand }} {{ $vehicle->model }}</td>
-                            <td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs {{ match($vehicle->status){'available'=>'bg-emerald-100 text-emerald-700','po'=>'bg-amber-100 text-amber-700','maintenance'=>'bg-rose-100 text-rose-700',default=>'bg-slate-200 text-slate-700'} }}">{{ strtoupper($vehicle->status) }}</span></td>
-                            <td class="px-4 py-3 text-right">
-                                <a class="text-blue-600" href="{{ route('fleet.vehicles.show', $vehicle) }}">Detail</a>
-                            </td>
+                        <tr>
+                            <td class="font-semibold text-slate-900">{{ $vehicle->plate_number }}</td>
+                            <td>{{ $vehicle->pool?->name ?? '-' }}</td>
+                            <td>{{ $vehicle->brand }} {{ $vehicle->model }}</td>
+                            <td><x-ui.status-badge :status="$vehicle->status" /></td>
+                            <td class="text-right"><a class="ui-link" href="{{ route('fleet.vehicles.show', $vehicle) }}">Open Detail</a></td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
             </div>
-            <div class="p-4">{{ $vehicles->links() }}</div>
+            <div class="border-t border-slate-200/80 px-4 py-4">{{ $vehicles->links() }}</div>
         @endif
-    </section>
+    </x-ui.table-card>
 </x-layouts.app>

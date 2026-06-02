@@ -14,7 +14,9 @@
 
 - GitHub: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
 - Branch utama: `main`
-- Checkpoint terbaru: `PHASE-4.2-DEMO-AUDIT-PASSED`
+- Live demo Railway: [web-production-c81b8.up.railway.app](https://web-production-c81b8.up.railway.app)
+- Checkpoint platform terakhir: `PHASE-5.2-RAILWAY-DEPLOYED`
+- Upgrade UI/UX saat ini: `Checkpoint 6.1 + 6.2`
 
 ## 🧱 Stack Final
 
@@ -122,9 +124,19 @@ Rekomendasi penggunaan:
 
 ## 🧪 Status Saat Ini
 
-- Checkpoint audit demo: `PHASE-4.2-DEMO-AUDIT-PASSED`
-- Baseline validasi sebelumnya tercatat: `82 tests passed`
-- Fokus berikutnya: `Google Stitch UI Polish + Railway Deployment Prep`
+- Railway deploy aktif dan smoke test inti sebelumnya sudah berhasil
+- CRUD + business flow utama sudah mencakup:
+  - Auth + RBAC
+  - CRM
+  - Fleet
+  - Drivers
+  - Booking + Pool Dispatch
+  - Finance Flow
+  - Maintenance
+  - HR backend-only
+- Upgrade navigasi dan detail-page enrichment sedang dirapikan untuk demo yang lebih kuat
+- Full build summary tersedia di:
+  - [docs/FULL_BUILD_SUMMARY.md](./docs/FULL_BUILD_SUMMARY.md)
 
 ## ⚠️ Prinsip Penting
 
@@ -193,3 +205,17 @@ When stress mode is enabled and `DEMO_CUSTOMER_COUNT` is empty, the seeder defau
 ### Deployment Docs
 
 - Detailed guide: [docs/RAILWAY_DEPLOYMENT.md](./docs/RAILWAY_DEPLOYMENT.md)
+
+## 🧾 Build Summary
+
+Kalau kamu ingin lihat hasil pembangunan project dari awal sampai state sekarang, buka:
+
+- [docs/FULL_BUILD_SUMMARY.md](./docs/FULL_BUILD_SUMMARY.md)
+
+Dokumen ini merangkum:
+
+- checkpoint per fase
+- fitur yang sudah selesai
+- runtime/deployment fixes
+- status validasi
+- progress UI/UX terbaru

@@ -1,4 +1,9 @@
 <x-layouts.app :title="'Bookings'" :header="'Bookings'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Bookings', 'url' => route('bookings.index')],
+    ]" />
+
     <x-ui.page-header title="Booking pipeline" eyebrow="Bookings" description="Monitor incoming requests, filter operational status, and jump quickly into dispatch or finance drill-down.">
         <x-slot:actions>
             @can('bookings.create')
@@ -49,7 +54,13 @@
                                 <p class="font-semibold text-slate-900">{{ $booking->booking_number }}</p>
                                 <p class="mt-1 text-xs text-slate-500">{{ $booking->end_datetime?->format('Y-m-d H:i') ? 'Ends '.$booking->end_datetime?->format('Y-m-d H:i') : 'No end schedule' }}</p>
                             </td>
-                            <td>{{ $booking->client?->name ?? '-' }}</td>
+                            <td>
+                                @if ($booking->client)
+                                    <a href="{{ route('crm.clients.show', $booking->client) }}" class="ui-link">{{ $booking->client->name }}</a>
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>{{ $booking->pool?->name ?? '-' }}</td>
                             <td>{{ $booking->start_datetime?->format('Y-m-d H:i') }}</td>
                             <td><x-ui.status-badge :status="$booking->status" /></td>

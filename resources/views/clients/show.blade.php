@@ -12,6 +12,12 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <section class="grid gap-4 md:grid-cols-3">
+        <x-ui.stat-card label="Client Tier" :value="strtoupper($client->tier)" hint="Commercial segmentation used by sales and finance." tone="blue" />
+        <x-ui.stat-card label="Contacts" :value="$client->contacts->count()" hint="Active account contacts linked to this client." tone="emerald" />
+        <x-ui.stat-card label="Open Invoices" :value="$client->invoices->whereIn('status', ['draft', 'sent', 'partial', 'overdue'])->count()" hint="Finance follow-up visibility from the client level." tone="amber" />
+    </section>
+
     <x-ui.form-card title="Client profile" description="Commercial identity and billing metadata for this account.">
         <dl class="ui-meta-grid">
             <div class="ui-meta-item"><dt>Name</dt><dd>{{ $client->name }}</dd></div>

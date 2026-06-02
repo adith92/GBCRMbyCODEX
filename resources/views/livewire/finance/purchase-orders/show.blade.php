@@ -1,40 +1,58 @@
 <x-layouts.app :title="'Purchase Order Detail'" :header="'Finance / Purchase Orders / Detail'">
-    @if($errorMessage)<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errorMessage }}</div>@endif
-    <section class="rounded-lg border bg-white p-4 text-sm">
-        <div class="grid gap-2 md:grid-cols-2">
-            <p><strong>PO Number:</strong> {{ $purchaseOrder->po_number }}</p>
-            <p><strong>Status:</strong> <span class="uppercase text-xs">{{ $purchaseOrder->status }}</span></p>
-            <p><strong>Booking:</strong> {{ $purchaseOrder->booking?->booking_number }}</p>
-            <p><strong>Client:</strong> {{ $purchaseOrder->client?->name }}</p>
-            <p><strong>Subtotal:</strong> {{ number_format($purchaseOrder->subtotal,2) }}</p>
-            <p><strong>Tax:</strong> {{ number_format($purchaseOrder->tax,2) }}</p>
-            <p><strong>Total:</strong> {{ number_format($purchaseOrder->total,2) }}</p>
-            <p><strong>Approved:</strong> {{ $purchaseOrder->approvedBy?->name ?? '-' }} {{ $purchaseOrder->approved_at?->format('Y-m-d H:i') }}</p>
-        </div>
-        <div class="mt-4 flex flex-wrap gap-2">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Finance', 'url' => route('finance.index')],
+        ['label' => 'Purchase Orders', 'url' => route('finance.purchase-orders.index')],
+        ['label' => $purchaseOrder->po_number, 'url' => route('finance.purchase-orders.show', $purchaseOrder)],
+    ]" />
+
+    <x-ui.page-header :title="$purchaseOrder->po_number" eyebrow="Purchase Order Detail" description="Review PO approval status, booking linkage, and invoice conversion from one place.">
+        <x-slot:actions>
+            <x-ui.status-badge :status="$purchaseOrder->status" />
+            <x-back-link :fallback="route('finance.purchase-orders.index')" />
+        </x-slot:actions>
+    </x-ui.page-header>
+
+    @if($errorMessage)<div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{{ $errorMessage }}</div>@endif
+    <x-ui.form-card title="Purchase order snapshot" description="Commercial values, linked booking, and current approval metadata.">
+        <dl class="ui-meta-grid">
+            <div class="ui-meta-item"><dt>PO Number</dt><dd>{{ $purchaseOrder->po_number }}</dd></div>
+            <div class="ui-meta-item"><dt>Status</dt><dd><x-ui.status-badge :status="$purchaseOrder->status" /></dd></div>
+            <div class="ui-meta-item"><dt>Booking</dt><dd>@if($purchaseOrder->booking)<a href="{{ route('bookings.show', $purchaseOrder->booking) }}" class="ui-link">{{ $purchaseOrder->booking->booking_number }}</a>@else - @endif</dd></div>
+            <div class="ui-meta-item"><dt>Client</dt><dd>@if($purchaseOrder->client)<a href="{{ route('crm.clients.show', $purchaseOrder->client) }}" class="ui-link">{{ $purchaseOrder->client->name }}</a>@else - @endif</dd></div>
+            <div class="ui-meta-item"><dt>Subtotal</dt><dd>{{ number_format($purchaseOrder->subtotal,2) }}</dd></div>
+            <div class="ui-meta-item"><dt>Tax</dt><dd>{{ number_format($purchaseOrder->tax,2) }}</dd></div>
+            <div class="ui-meta-item"><dt>Total</dt><dd>{{ number_format($purchaseOrder->total,2) }}</dd></div>
+            <div class="ui-meta-item"><dt>Approved</dt><dd>{{ $purchaseOrder->approvedBy?->name ?? '-' }} {{ $purchaseOrder->approved_at?->format('Y-m-d H:i') }}</dd></div>
+        </dl>
+        <div class="mt-5 flex flex-wrap gap-3">
             @if(in_array($purchaseOrder->status,['draft','pending']) && auth()->user()->can('purchase-orders.create'))
-                <a href="{{ route('finance.purchase-orders.edit',$purchaseOrder) }}" class="rounded border px-3 py-2 text-sm">Edit</a>
+                <x-ui.action-button :href="route('finance.purchase-orders.edit',$purchaseOrder)" variant="secondary">Edit</x-ui.action-button>
             @endif
             @if(in_array($purchaseOrder->status,['draft','pending']) && auth()->user()->can('purchase-orders.approve'))
-                <button wire:click="approve" wire:confirm="Approve this PO?" class="rounded bg-emerald-600 px-3 py-2 text-sm text-white">Approve</button>
+                <x-ui.action-button wire:click="approve" wire:confirm="Approve this PO?" variant="success">Approve</x-ui.action-button>
             @endif
         </div>
-    </section>
+    </x-ui.form-card>
 
-    <section class="rounded-lg border bg-white p-4">
-        <h3 class="text-sm font-semibold">Generate Invoice</h3>
-        <form wire:submit="createInvoice" class="mt-3 grid gap-3 md:grid-cols-3">
-            <select wire:model="invoice_action" class="rounded border-slate-300 text-sm"><option value="draft">Create as Draft</option><option value="sent">Create and Mark Sent</option></select>
-            <input wire:model="due_at" type="date" class="rounded border-slate-300 text-sm">
-            <div class="text-right"><button class="rounded bg-slate-900 px-3 py-2 text-sm text-white" @disabled(!auth()->user()->can('invoices.create'))>Create Invoice</button></div>
+    <x-ui.form-card title="Generate invoice" description="Convert approved PO into an invoice while keeping the finance flow connected.">
+        <form wire:submit="createInvoice" class="grid gap-4 md:grid-cols-3">
+            <select wire:model="invoice_action" class="ui-select"><option value="draft">Create as Draft</option><option value="sent">Create and Mark Sent</option></select>
+            <input wire:model="due_at" type="date" class="ui-input">
+            <div class="text-right"><x-ui.action-button type="submit" variant="primary" @disabled(!auth()->user()->can('invoices.create'))>Create Invoice</x-ui.action-button></div>
         </form>
         @if($purchaseOrder->invoices->isNotEmpty())
-            <div class="mt-4 text-sm">
-                <p class="mb-1 font-medium">Existing Invoices</p>
+            <div class="mt-5 space-y-3 text-sm">
+                <p class="font-medium text-slate-900">Existing Invoices</p>
                 @foreach($purchaseOrder->invoices as $invoice)
-                    <a href="{{ route('finance.invoices.show',$invoice) }}" class="block rounded border p-2 hover:bg-slate-50">{{ $invoice->invoice_number }} <span class="float-right uppercase text-xs">{{ $invoice->status }}</span></a>
+                    <a href="{{ route('finance.invoices.show',$invoice) }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-emerald-200 hover:bg-emerald-50/40">
+                        <div class="flex items-start justify-between gap-3">
+                            <p class="font-semibold text-slate-900">{{ $invoice->invoice_number }}</p>
+                            <x-ui.status-badge :status="$invoice->status" />
+                        </div>
+                    </a>
                 @endforeach
             </div>
         @endif
-    </section>
+    </x-ui.form-card>
 </x-layouts.app>

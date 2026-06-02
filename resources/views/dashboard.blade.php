@@ -28,15 +28,15 @@
     </x-ui.page-header>
 
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <x-ui.stat-card label="Total Active Clients" :value="$activeClients" hint="Accounts currently ready for commercial follow-up." tone="blue" />
-        <x-ui.stat-card label="Active Bookings" :value="$activeBookings" hint="Pending, assigned, and confirmed workload in motion." tone="emerald" />
-        <x-ui.stat-card label="Pending Bookings" :value="$pendingBookings" hint="Need dispatch review or commercial follow-up." tone="amber" />
-        <x-ui.stat-card label="Available Vehicles" :value="$availableVehicles" hint="Fleet units currently ready for assignment." tone="blue" />
-        <x-ui.stat-card label="Vehicles In PO" :value="$vehiclesInPo" hint="Already committed to upcoming dispatch activity." tone="amber" />
-        <x-ui.stat-card label="Vehicles In Maintenance" :value="$vehiclesInMaintenance" hint="Temporarily unavailable due to workshop handling." tone="rose" />
-        <x-ui.stat-card label="Outstanding Invoices" :value="number_format(max(0, $outstandingInvoiceAmount), 2)" hint="Open finance exposure from sent, partial, and overdue invoices." tone="slate" />
-        <x-ui.stat-card label="Overdue Invoices" :value="$overdueInvoices" hint="Invoices that need urgent collection attention." tone="rose" />
-        <x-ui.stat-card label="Today Pool Queue" :value="$todayPoolQueueCount" hint="Dispatch queue requiring same-day operational attention." tone="amber" />
+        <x-ui.stat-card label="Total Active Clients" :value="$activeClients" hint="Accounts currently ready for commercial follow-up." tone="blue" :href="route('crm.clients.index', ['status' => 'active'])" link-label="Open CRM" />
+        <x-ui.stat-card label="Active Bookings" :value="$activeBookings" hint="Pending, assigned, and confirmed workload in motion." tone="emerald" :href="route('bookings.index')" link-label="Open Pipeline" />
+        <x-ui.stat-card label="Pending Bookings" :value="$pendingBookings" hint="Need dispatch review or commercial follow-up." tone="amber" :href="route('bookings.index', ['status' => 'pending'])" link-label="Review Queue" />
+        <x-ui.stat-card label="Available Vehicles" :value="$availableVehicles" hint="Fleet units currently ready for assignment." tone="blue" :href="route('fleet.vehicles.index', ['status' => 'available'])" link-label="Open Fleet" />
+        <x-ui.stat-card label="Vehicles In PO" :value="$vehiclesInPo" hint="Already committed to upcoming dispatch activity." tone="amber" :href="route('fleet.vehicles.index', ['status' => 'po'])" link-label="Open Fleet" />
+        <x-ui.stat-card label="Vehicles In Maintenance" :value="$vehiclesInMaintenance" hint="Temporarily unavailable due to workshop handling." tone="rose" :href="route('maintenance.index', ['status' => 'in_progress'])" link-label="Open Maintenance" />
+        <x-ui.stat-card label="Outstanding Invoices" :value="number_format(max(0, $outstandingInvoiceAmount), 2)" hint="Open finance exposure from sent, partial, and overdue invoices." tone="slate" :href="route('finance.invoices.index')" link-label="Open Finance" />
+        <x-ui.stat-card label="Overdue Invoices" :value="$overdueInvoices" hint="Invoices that need urgent collection attention." tone="rose" :href="route('finance.invoices.index')" link-label="Collect Now" />
+        <x-ui.stat-card label="Today Pool Queue" :value="$todayPoolQueueCount" hint="Dispatch queue requiring same-day operational attention." tone="amber" :href="route('pool.queue')" link-label="Open Pool" />
     </section>
 
     <section class="grid gap-5 xl:grid-cols-3">
@@ -56,6 +56,7 @@
                                 </div>
                                 <x-ui.status-badge :status="$booking->status" />
                             </div>
+                            <p class="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">Open booking detail</p>
                         </a>
                     @endforeach
                 </div>
@@ -78,6 +79,7 @@
                                 </div>
                                 <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{{ $payment->paid_at?->format('Y-m-d') }}</p>
                             </div>
+                            <p class="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Open invoice detail</p>
                         </a>
                     @endforeach
                 </div>
@@ -100,6 +102,7 @@
                                 </div>
                                 <x-ui.status-badge :status="$log->status" />
                             </div>
+                            <p class="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">Open maintenance detail</p>
                         </a>
                     @endforeach
                 </div>

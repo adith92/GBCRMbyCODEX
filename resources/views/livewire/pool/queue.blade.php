@@ -1,4 +1,9 @@
 <x-layouts.app :title="'Pool Queue'" :header="'Pool / Dispatch Queue'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Pool Queue', 'url' => route('pool.queue')],
+    ]" />
+
     <x-ui.page-header title="Dispatch queue" eyebrow="Pool Operations" description="Review bookings waiting for assignment and keep same-day dispatch activity under control." />
 
     <x-ui.form-card title="Filter Queue" description="Search by booking or client, then narrow down by pool and dispatch status.">
@@ -46,7 +51,13 @@
                                 <p class="font-semibold text-slate-900">{{ $booking->booking_number }}</p>
                                 <div class="mt-2"><x-ui.status-badge :status="$booking->status" /></div>
                             </td>
-                            <td>{{ $booking->client?->name ?? '-' }}</td>
+                            <td>
+                                @if ($booking->client)
+                                    <a href="{{ route('crm.clients.show', $booking->client) }}" class="ui-link">{{ $booking->client->name }}</a>
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>{{ $booking->pool?->name ?? '-' }}</td>
                             <td>{{ $booking->start_datetime?->format('Y-m-d H:i') }}<br><span class="text-xs text-slate-500">to {{ $booking->end_datetime?->format('Y-m-d H:i') }}</span></td>
                             <td>
@@ -54,6 +65,7 @@
                                 <p class="mt-2"><span class="text-xs uppercase tracking-[0.14em] text-slate-500">Driver</span><br>{{ $booking->driver?->name ?? '-' }}</p>
                             </td>
                             <td class="text-right">
+                                <a href="{{ route('bookings.show', $booking) }}" class="ui-link mr-3">Detail</a>
                                 @can('pool.assign-driver')
                                     <x-ui.action-button :href="route('pool.assign', $booking)" variant="secondary">Assign</x-ui.action-button>
                                 @endcan

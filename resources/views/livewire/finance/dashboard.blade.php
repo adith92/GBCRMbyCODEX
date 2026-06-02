@@ -1,11 +1,16 @@
 <x-layouts.app :title="'Finance Dashboard'" :header="'Finance / Dashboard'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Finance', 'url' => route('finance.index')],
+    ]" />
+
     <x-ui.page-header title="Finance control room" eyebrow="Finance" description="Keep revenue exposure, collection performance, and overdue follow-up visible without leaving the demo flow." />
 
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <x-ui.stat-card label="Invoice Sent / Partial" :value="number_format($totalInvoiceOpen, 2)" hint="Open invoiced amount still under collection." tone="amber" />
-        <x-ui.stat-card label="Total Paid" :value="number_format($totalPaid, 2)" hint="Collected payment value recorded in the system." tone="emerald" />
-        <x-ui.stat-card label="Outstanding" :value="number_format($outstanding, 2)" hint="Remaining open balance after recorded payments." tone="slate" />
-        <x-ui.stat-card label="Overdue Invoices" :value="$overdueCount" hint="Requires immediate finance follow-up." tone="rose" />
+        <x-ui.stat-card label="Invoice Sent / Partial" :value="number_format($totalInvoiceOpen, 2)" hint="Open invoiced amount still under collection." tone="amber" :href="route('finance.invoices.index')" link-label="Open Invoices" />
+        <x-ui.stat-card label="Total Paid" :value="number_format($totalPaid, 2)" hint="Collected payment value recorded in the system." tone="emerald" :href="route('finance.invoices.index')" link-label="Open Collections" />
+        <x-ui.stat-card label="Outstanding" :value="number_format($outstanding, 2)" hint="Remaining open balance after recorded payments." tone="slate" :href="route('finance.invoices.index')" link-label="Review Open" />
+        <x-ui.stat-card label="Overdue Invoices" :value="$overdueCount" hint="Requires immediate finance follow-up." tone="rose" :href="route('finance.invoices.index')" link-label="Follow Up" />
     </section>
 
     <section class="grid gap-5 xl:grid-cols-2">

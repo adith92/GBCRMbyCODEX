@@ -1,4 +1,10 @@
 <x-layouts.app :title="'Create Booking'" :header="'Bookings / Create'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Bookings', 'url' => route('bookings.index')],
+        ['label' => 'Create Booking'],
+    ]" />
+
     <x-ui.page-header title="Create booking" eyebrow="Bookings" description="Capture a client transport request without breaking the later dispatch and finance workflow." />
 
     <x-ui.form-card title="Booking request form" description="Fill the commercial details first. Pool, driver, and vehicle can still be completed later by dispatch.">

@@ -1,4 +1,10 @@
 <x-layouts.app :title="'Purchase Orders'" :header="'Finance / Purchase Orders'">
+    <x-breadcrumbs :items="[
+        ['label' => 'Dashboard', 'url' => route('dashboard')],
+        ['label' => 'Finance', 'url' => route('finance.index')],
+        ['label' => 'Purchase Orders', 'url' => route('finance.purchase-orders.index')],
+    ]" />
+
     <x-ui.page-header title="Purchase orders" eyebrow="Finance" description="Track purchase orders created from confirmed bookings and move them toward invoicing.">
         <x-slot:actions>
             @can('purchase-orders.create')
@@ -20,7 +26,7 @@
         @if($purchaseOrders->count()===0)
             <div class="p-5"><x-ui.empty-state title="No purchase orders found" description="Create a PO from a confirmed booking to start the finance document chain." /></div>
         @else
-            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>PO</th><th>Client</th><th>Status</th><th>Total</th><th class="text-right">Action</th></tr></thead><tbody>@foreach($purchaseOrders as $po)<tr><td><p class="font-semibold text-slate-900">{{ $po->po_number }}</p></td><td>{{ $po->client?->name }}</td><td><x-ui.status-badge :status="$po->status" /></td><td>{{ number_format($po->total,2) }}</td><td class="text-right"><a class="ui-link" href="{{ route('finance.purchase-orders.show',$po) }}">Open Detail</a></td></tr>@endforeach</tbody></table></div>
+            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>PO</th><th>Client</th><th>Status</th><th>Total</th><th class="text-right">Action</th></tr></thead><tbody>@foreach($purchaseOrders as $po)<tr><td><p class="font-semibold text-slate-900">{{ $po->po_number }}</p></td><td>@if($po->client)<a class="ui-link" href="{{ route('crm.clients.show', $po->client) }}">{{ $po->client->name }}</a>@else - @endif</td><td><x-ui.status-badge :status="$po->status" /></td><td>{{ number_format($po->total,2) }}</td><td class="text-right"><a class="ui-link" href="{{ route('finance.purchase-orders.show',$po) }}">Open Detail</a></td></tr>@endforeach</tbody></table></div>
             <div class="border-t border-slate-200/80 px-4 py-4">{{ $purchaseOrders->links() }}</div>
         @endif
     </x-ui.table-card>

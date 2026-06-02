@@ -161,7 +161,9 @@ class OperationsDashboardDrilldownTest extends TestCase
             ->assertSee('Total Active Clients')
             ->assertSee('Active Bookings')
             ->assertSee('Available Vehicles')
-            ->assertSee('Overdue Invoices');
+            ->assertSee('Overdue Invoices')
+            ->assertSee(route('crm.clients.index', ['status' => 'active']), false)
+            ->assertSee(route('pool.queue'), false);
     }
 
     public function test_dashboard_counts_update_from_seeded_data(): void
@@ -202,5 +204,23 @@ class OperationsDashboardDrilldownTest extends TestCase
             ->get(route('finance.invoices.show', $invoice))
             ->assertSee(route('crm.clients.show', $invoice->client), false)
             ->assertSee(route('finance.purchase-orders.show', $invoice->purchaseOrder), false);
+    }
+
+    public function test_finance_and_pool_index_pages_render_breadcrumb_navigation(): void
+    {
+        $finance = User::query()->where('email', 'finance@blueerp.test')->firstOrFail();
+        $pool = User::query()->where('email', 'headpool@blueerp.test')->firstOrFail();
+
+        $this->actingAs($finance)
+            ->get(route('finance.purchase-orders.index'))
+            ->assertOk()
+            ->assertSee('Dashboard')
+            ->assertSee('Finance')
+            ->assertSee('Purchase Orders');
+
+        $this->actingAs($pool)
+            ->get(route('pool.queue'))
+            ->assertOk()
+            ->assertSee('Pool Queue');
     }
 }

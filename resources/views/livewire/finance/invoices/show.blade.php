@@ -16,6 +16,12 @@
         <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{{ $errorMessage }}</div>
     @endif
 
+    <section class="grid gap-4 md:grid-cols-3">
+        <x-ui.stat-card label="Total Invoice" :value="number_format($invoice->total, 2)" hint="Commercial amount billed to the client." tone="blue" />
+        <x-ui.stat-card label="Paid Amount" :value="number_format($invoice->paid_amount, 2)" hint="Collections already recorded against this invoice." tone="emerald" />
+        <x-ui.stat-card label="Remaining" :value="number_format(max(0, $invoice->total - $invoice->paid_amount), 2)" hint="Outstanding exposure still waiting for settlement." tone="amber" />
+    </section>
+
     <x-ui.form-card title="Invoice snapshot" description="Commercial and finance metadata for this invoice.">
         <dl class="ui-meta-grid">
             <div class="ui-meta-item"><dt>Invoice</dt><dd>{{ $invoice->invoice_number }}</dd></div>

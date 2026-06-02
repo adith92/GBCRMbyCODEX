@@ -16,6 +16,12 @@
         <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{{ $errorMessage }}</div>
     @endif
 
+    <section class="grid gap-4 md:grid-cols-3">
+        <x-ui.stat-card label="Client" :value="$booking->client?->name ?? '-'" hint="Commercial owner of this request." tone="blue" />
+        <x-ui.stat-card label="Assignment History" :value="$booking->driverAssignments->count()" hint="Number of assignment changes recorded for this booking." tone="emerald" />
+        <x-ui.stat-card label="Finance Docs" :value="$booking->purchaseOrders->count() + $booking->purchaseOrders->flatMap->invoices->count()" hint="Linked purchase orders and invoices for this booking." tone="amber" />
+    </section>
+
     <x-ui.form-card title="Booking snapshot" description="Core operational and commercial data for this request.">
         <dl class="ui-meta-grid">
             <div class="ui-meta-item"><dt>Booking Number</dt><dd>{{ $booking->booking_number }}</dd></div>
