@@ -2,7 +2,7 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-7.1-SEARCH-FILTERS-ACTIVITY-DRILLDOWN-COMPLETE  
+**Checkpoint ID:** PHASE-7.2-RAILWAY-REFRESH-SMOKE-REVALIDATED  
 **Date:** 2026-06-03  
 **Status:** Complete  
 **Branch:** main
@@ -55,6 +55,23 @@
 - Added activity type filters and summary cards for faster drill-down into bookings, invoices, payments, maintenance, and meetings.
 - Extended TDD coverage for scoped search and filtered activity timeline behavior.
 
+### Checkpoint 7.2 — Railway Refresh + Smoke Revalidation
+
+- Linked the stable clone workspace to the live Railway project again.
+- Updated Railway production `APP_URL` to the active public domain `https://gbdemo01.up.railway.app`.
+- Revalidated live smoke routes using demo credentials:
+  - `/login`
+  - `/dashboard`
+  - `/crm/clients`
+  - `/fleet/vehicles`
+  - `/drivers`
+  - `/bookings`
+  - `/pool/queue`
+  - `/finance`
+  - `/maintenance`
+  - `/admin/hr/drivers`
+- Verified finance user still receives `403` for the HR route.
+
 ## Validation Result
 
 - Validation completed successfully from the stable clone workspace:
@@ -67,12 +84,16 @@
 - Additional targeted validation for checkpoint 7.1:
   - `php artisan test tests/Feature/GlobalSearchActivityTest.php`
   - Result: `6 passed`
+- Live Railway smoke revalidation for checkpoint 7.2:
+  - Super-admin login redirect to `/dashboard`: success
+  - Main demo routes: all returned `200`
+  - Finance access to `/admin/hr/drivers`: returned `403`
 
 ## Known TODO
 
-- Refresh Railway deployment using the latest phase 7 code.
-- Run live smoke verification after deploy refresh.
+- Finalize handoff docs and review pack.
+- Optional: add more visual screenshots if stakeholder handoff requires them.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 7.2 — Railway Refresh + Smoke Revalidation**.
+Proceed to **Checkpoint 7.3 — Final Demo Review Pack**.

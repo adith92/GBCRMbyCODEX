@@ -117,6 +117,10 @@ php artisan key:generate --show
 3. Set `APP_URL` to the generated Railway domain.
 4. Redeploy if required.
 
+Current verified live domain:
+
+- `https://gbdemo01.up.railway.app`
+
 ## Smoke Test
 
 After deployment verify:

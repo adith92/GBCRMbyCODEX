@@ -248,6 +248,15 @@ Selesai:
 - summary card ringan untuk activity membantu drill-down saat demo
 - targeted TDD coverage bertambah untuk scoped search dan filtered activity
 
+### Phase 7.2 — Railway Refresh + Smoke Revalidation
+
+Selesai:
+
+- workspace clone sehat di-link ulang ke Railway project live
+- `APP_URL` production diselaraskan ke domain aktif `https://gbdemo01.up.railway.app`
+- smoke test live sukses untuk route demo inti
+- pembatasan HR tetap tervalidasi untuk non-super-admin
+
 ## Validation Summary
 
 Yang sudah pernah tercatat berhasil pada checkpoint sebelumnya:

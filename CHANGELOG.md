@@ -8,7 +8,10 @@ Semua perubahan penting di repo ini dicatat di file ini.
 
 ## [7.2] - 2026-06-03
 
-- Placeholder untuk Railway refresh dan smoke revalidation phase 7.
+- Railway project di-link ulang dari clone workspace sehat.
+- `APP_URL` production diselaraskan ke domain aktif `https://gbdemo01.up.railway.app`.
+- Smoke test live berhasil untuk login, dashboard, CRM, fleet, drivers, bookings, pool, finance, maintenance, dan HR super-admin access.
+- Verifikasi `403` untuk HR route sebagai finance user berhasil.
 
 ## [7.1] - 2026-06-03
 

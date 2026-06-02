@@ -14,8 +14,8 @@
 
 - GitHub: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
 - Branch utama: `main`
-- Live demo Railway: [web-production-c81b8.up.railway.app](https://web-production-c81b8.up.railway.app)
-- Checkpoint platform terakhir: `PHASE-7.1-SEARCH-FILTERS-ACTIVITY-DRILLDOWN-COMPLETE`
+- Live demo Railway: [gbdemo01.up.railway.app](https://gbdemo01.up.railway.app)
+- Checkpoint platform terakhir: `PHASE-7.2-RAILWAY-REFRESH-SMOKE-REVALIDATED`
 - Upgrade UI/UX saat ini: `Checkpoint 6.1 + 7.1`
 
 ## 🧱 Stack Final
@@ -129,6 +129,7 @@ Rekomendasi penggunaan:
 ## 🧪 Status Saat Ini
 
 - Railway deploy aktif dan smoke test inti sebelumnya sudah berhasil
+- Railway live refresh terbaru sudah diverifikasi ulang di domain aktif `gbdemo01.up.railway.app`
 - CRUD + business flow utama sudah mencakup:
   - Auth + RBAC
   - CRM
