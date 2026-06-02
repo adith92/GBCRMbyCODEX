@@ -162,8 +162,12 @@ class OperationsDashboardDrilldownTest extends TestCase
             ->assertSee('Active Bookings')
             ->assertSee('Available Vehicles')
             ->assertSee('Overdue Invoices')
+            ->assertSee('Workspace Search')
+            ->assertSee('Recent Activity')
             ->assertSee(route('crm.clients.index', ['status' => 'active']), false)
-            ->assertSee(route('pool.queue'), false);
+            ->assertSee(route('pool.queue'), false)
+            ->assertSee(route('search.index'), false)
+            ->assertSee(route('activity.index'), false);
     }
 
     public function test_dashboard_counts_update_from_seeded_data(): void

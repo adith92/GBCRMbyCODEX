@@ -39,6 +39,40 @@
         <x-ui.stat-card label="Today Pool Queue" :value="$todayPoolQueueCount" hint="Dispatch queue requiring same-day operational attention." tone="amber" :href="route('pool.queue')" link-label="Open Pool" />
     </section>
 
+    @if (
+        $user?->can('clients.view')
+        || $user?->can('vehicles.view')
+        || $user?->can('drivers.view')
+        || $user?->can('bookings.view')
+        || $user?->can('invoices.view')
+        || $user?->can('maintenance.view')
+        || $user?->can('meeting-logs.view')
+    )
+        <section class="grid gap-4 lg:grid-cols-2">
+            <a href="{{ route('search.index') }}" class="ui-card group px-5 py-5 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_24px_55px_-32px_rgba(29,78,216,0.4)]">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">Quick Access</p>
+                <div class="mt-3 flex items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold tracking-tight text-slate-950">Workspace Search</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-500">Jump directly to clients, vehicles, drivers, bookings, invoices, and maintenance records during demos or live operations review.</p>
+                    </div>
+                    <span class="rounded-2xl bg-blue-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">Search</span>
+                </div>
+            </a>
+
+            <a href="{{ route('activity.index') }}" class="ui-card group px-5 py-5 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-[0_24px_55px_-32px_rgba(5,150,105,0.35)]">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Quick Access</p>
+                <div class="mt-3 flex items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold tracking-tight text-slate-950">Recent Activity</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-500">Review the latest booking, finance, CRM, and maintenance movement from one lightweight operational timeline.</p>
+                    </div>
+                    <span class="rounded-2xl bg-emerald-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Timeline</span>
+                </div>
+            </a>
+        </section>
+    @endif
+
     <section class="grid gap-5 xl:grid-cols-3">
         <x-ui.table-card title="Latest Bookings" description="Recent booking activity with fast drill-down into operational detail.">
             @if ($latestBookings->isEmpty())

@@ -3,8 +3,10 @@
 use App\Http\Controllers\ClientContactController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\MeetingLogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VehicleController;
 use App\Livewire\Admin\Hr\Attendance as HrAttendance;
 use App\Livewire\Admin\Hr\Drivers as HrDrivers;
@@ -41,6 +43,9 @@ Route::middleware('auth')->group(function () {
     Route::view('/dashboard', 'dashboard')
         ->middleware('permission:dashboard.view')
         ->name('dashboard');
+
+    Route::get('/search', SearchController::class)->name('search.index');
+    Route::get('/activity', ActivityController::class)->name('activity.index');
 
     Route::prefix('/crm')->name('crm.')->group(function (): void {
         Route::get('/', fn () => redirect()->route('crm.clients.index'))

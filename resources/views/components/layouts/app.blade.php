@@ -15,6 +15,8 @@
     $user = auth()->user();
     $menuItems = [
         ['label' => 'Dashboard', 'route' => 'dashboard', 'permissions' => ['dashboard.view'], 'icon' => 'DB'],
+        ['label' => 'Search', 'route' => 'search.index', 'permissions' => ['clients.view', 'vehicles.view', 'drivers.view', 'bookings.view', 'invoices.view', 'maintenance.view', 'meeting-logs.view'], 'icon' => 'SR'],
+        ['label' => 'Activity', 'route' => 'activity.index', 'permissions' => ['clients.view', 'bookings.view', 'invoices.view', 'payments.view', 'maintenance.view', 'meeting-logs.view'], 'icon' => 'AC'],
         ['label' => 'CRM', 'route' => 'crm.index', 'permissions' => ['clients.view', 'meeting-logs.view'], 'icon' => 'CR'],
         ['label' => 'Fleet', 'route' => 'fleet.index', 'permissions' => ['vehicles.view'], 'icon' => 'FL'],
         ['label' => 'Drivers', 'route' => 'drivers.index', 'permissions' => ['drivers.view'], 'icon' => 'DR'],
@@ -88,6 +90,23 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
+                    @if ($user && (
+                        $user->can('clients.view')
+                        || $user->can('vehicles.view')
+                        || $user->can('drivers.view')
+                        || $user->can('bookings.view')
+                        || $user->can('invoices.view')
+                        || $user->can('maintenance.view')
+                        || $user->can('meeting-logs.view')
+                    ))
+                        <form action="{{ route('search.index') }}" method="GET" class="hidden xl:block">
+                            <label for="global-search" class="sr-only">Search workspace</label>
+                            <div class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+                                <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Search</span>
+                                <input id="global-search" name="q" type="text" value="{{ request('q') }}" placeholder="Client, booking, invoice..." class="w-56 border-0 bg-transparent px-0 py-0 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-0">
+                            </div>
+                        </form>
+                    @endif
                     <div class="hidden rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-right sm:block">
                         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Current Role</p>
                         <p class="mt-1 text-sm font-semibold text-slate-900">{{ $user?->getRoleNames()->join(', ') ?: 'No Role' }}</p>

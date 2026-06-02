@@ -220,6 +220,25 @@ Sedang / baru dirapikan:
 - summary stat cards pada detail pages
 - form consistency dengan current UI components
 
+### Phase 6.3 — Global Search + Activity Visibility
+
+Selesai:
+
+- global search lintas client, vehicle, driver, booking, invoice, dan maintenance
+- hasil search tetap permission-aware per role
+- recent activity timeline untuk bookings, finance, maintenance, dan CRM follow-up
+- route + navigation wiring untuk search dan activity
+- feature tests baru untuk search visibility dan activity rendering
+
+### Phase 6.4 — Final Navigation Hardening
+
+Selesai:
+
+- dashboard quick access ke Workspace Search dan Recent Activity
+- final pass untuk demo-friendly navigation tanpa refactor flow bisnis
+- validasi penuh berhasil dari clone workspace stabil
+- total suite terbaru: `90 passed`
+
 ## Validation Summary
 
 Yang sudah pernah tercatat berhasil pada checkpoint sebelumnya:

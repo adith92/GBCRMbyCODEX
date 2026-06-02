@@ -2,9 +2,9 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-6.2-DETAIL-PAGE-ENRICHMENT-IN-PROGRESS  
+**Checkpoint ID:** PHASE-6.4-NAVIGATION-SEARCH-ACTIVITY-COMPLETE  
 **Date:** 2026-06-03  
-**Status:** In Progress  
+**Status:** Complete  
 **Branch:** main
 
 ## Completed Work
@@ -35,18 +35,35 @@
   - README status refresh
   - full build summary from foundation to current phase
 
+### Checkpoint 6.3 — Global Search + Activity Visibility
+
+- Added permission-aware global search across clients, vehicles, drivers, bookings, invoices, and maintenance.
+- Added a lightweight recent activity timeline spanning bookings, invoices, payments, maintenance, and CRM follow-up.
+- Wired protected search and activity routes into the authenticated workspace.
+- Added sidebar and topbar navigation access for search/activity based on user permission scope.
+- Added feature tests covering role-aware search visibility and activity rendering.
+
+### Checkpoint 6.4 — Final Navigation Hardening
+
+- Added dashboard quick-access cards for Workspace Search and Recent Activity.
+- Completed a lightweight demo-navigation polish pass without changing core business logic.
+- Finished validation from the stable clone workspace with clean artisan/test completion.
+
 ## Validation Result
 
-- PHP syntax sanity check passed for updated PHP test/controller/livewire files checked in this phase.
-- Targeted artisan-based validation remains unreliable in this local environment because the same historical hang pattern can still appear.
-- Git index on the original local working repository also became unstable, so an isolated clean clone was prepared to continue safe commit/push work.
+- Validation completed successfully from the stable clone workspace:
+  - `php artisan optimize:clear`
+  - `php artisan migrate:fresh --seed`
+  - `npm run build`
+  - `php artisan test`
+- Current full test result: `90 passed`
+- Original local repository git index instability remains a historical note only; active implementation/validation continued safely from the clean clone workspace.
 
 ## Known TODO
 
-- Finish clean commit/push sequence from the stable clone workspace.
-- Run targeted tests from the clone workspace.
-- If artisan returns cleanly, run broader validation for the latest UI/detail enrichment pass.
+- Continue with future Phase 6 follow-up only if a broader global command palette, richer activity filters, or extra demo polish is still desired.
+- Optionally re-run Railway smoke tests after these latest phase 6 navigation improvements are deployed.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 6.3 — Global Search + Activity Visibility** after 6.2 is committed and validated.
+Proceed to **Checkpoint 7.1 — Extended Search Filters, Activity Drill-down, and Demo Deployment Refresh** if further iteration is needed.

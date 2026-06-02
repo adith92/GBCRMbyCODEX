@@ -15,8 +15,8 @@
 - GitHub: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
 - Branch utama: `main`
 - Live demo Railway: [web-production-c81b8.up.railway.app](https://web-production-c81b8.up.railway.app)
-- Checkpoint platform terakhir: `PHASE-5.2-RAILWAY-DEPLOYED`
-- Upgrade UI/UX saat ini: `Checkpoint 6.1 + 6.2`
+- Checkpoint platform terakhir: `PHASE-6.4-NAVIGATION-SEARCH-ACTIVITY-COMPLETE`
+- Upgrade UI/UX saat ini: `Checkpoint 6.1 + 6.4`
 
 ## 🧱 Stack Final
 
@@ -68,6 +68,8 @@ flowchart LR
 - 🛠️ Maintenance Flow
 - 🛡️ HR backend-only untuk Super Admin
 - 📊 Dashboard KPI + drill-down
+- 🔎 Global Search lintas modul yang permission-aware
+- 🕘 Recent Activity timeline lintas workflow
 - 🧪 Demo Seeder + QA Docs
 
 ## 🧭 Demo Flow Utama
@@ -134,7 +136,8 @@ Rekomendasi penggunaan:
   - Finance Flow
   - Maintenance
   - HR backend-only
-- Upgrade navigasi dan detail-page enrichment sedang dirapikan untuk demo yang lebih kuat
+- Upgrade navigasi, detail-page enrichment, global search, dan recent activity sudah selesai untuk phase 6
+- Full validation terbaru dari clone stabil: `90 tests passed`
 - Full build summary tersedia di:
   - [docs/FULL_BUILD_SUMMARY.md](./docs/FULL_BUILD_SUMMARY.md)
 
