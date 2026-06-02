@@ -46,49 +46,60 @@ Added deployment prep assets:
 - `railway/run-cron.sh`
 - `.env.railway.example`
 - `docs/RAILWAY_DEPLOYMENT.md`
+- `nixpacks.toml`
 
 Updated docs:
 
-- `README.md` with Railway deployment section, build/pre-deploy guidance, and smoke test checklist
+- `README.md` with Railway deployment section, build/pre-deploy guidance, smoke test checklist, and scalable demo seed configuration
+
+## Scalable Demo Seeder Update
+
+Added scalable demo seed support:
+
+- `ENABLE_DEMO_SEED=true|false`
+- `DEMO_SEED_MODE=demo|stress`
+- `DEMO_CUSTOMER_COUNT=<integer>`
+
+Behavior summary:
+
+- `demo` mode keeps curated walkthrough data and now supports roughly 10-50 demo clients.
+- `stress` mode generates larger searchable data with a default effective size of 1200 clients when `DEMO_CUSTOMER_COUNT` is not set.
+- Added search-oriented indexes for clients and drivers through a new migration.
+- Added seeder coverage tests for demo mode, stress mode, and client index search/pagination behavior.
 
 ## Validation Result
 
-Validation attempted:
+Validation attempted for this checkpoint update:
 
-1. `composer install`
-   - Reached dependency verification and autoload generation output.
-   - Environment again did not return a clean completion signal afterward.
-2. `npm install`
-   - Included in the attempted full sequence, but the full combined run was blocked by the same environment hang pattern.
-3. `php artisan optimize:clear`
-   - Attempted separately.
-   - Environment did not return a clean completion signal.
-4. `php artisan migrate:fresh --seed`
-   - Attempted separately.
-   - Environment did not return a clean completion signal.
-5. `npm run build`
-   - Attempted separately.
-   - Environment did not return a clean completion signal.
-6. `php artisan test`
-   - Attempted separately.
-   - Environment did not return a clean completion signal.
-
-Additional checks completed:
-
-- `sh -n railway/init-app.sh railway/run-worker.sh railway/run-cron.sh` -> passed
-- Manual review completed on updated Blade layout, UI components, dashboard, finance, pool, maintenance, client, vehicle, and HR driver views
+1. `php -l database/seeders/DemoDataSeeder.php`
+   - Passed.
+2. `php -l database/migrations/2026_06_02_120000_add_search_indexes_to_core_demo_tables.php`
+   - Passed.
+3. `php -l tests/Feature/ScalableDemoSeederTest.php`
+   - Passed.
+4. `php -l tests/Feature/CoreDatabaseSchemaTest.php`
+   - Passed.
+5. `php artisan optimize:clear`
+   - Started and produced partial output.
+   - Environment did not return a clean completion signal afterward and the process had to be stopped.
+6. `php artisan migrate:fresh --seed`
+   - Not attempted after the runtime hang pattern reappeared on `optimize:clear`.
+7. `npm run build`
+   - Not attempted in this pass because the runtime was already showing the same incomplete completion pattern.
+8. `php artisan test`
+   - Not attempted in this pass because the runtime was already showing the same incomplete completion pattern.
 
 Notes:
 
-- Because the runtime environment did not provide clean completion signals, this checkpoint does **not** claim fresh full validation passing.
-- The last previously recorded green baseline remains from the earlier checkpoint before this UI/deploy-prep update.
+- This checkpoint update does **not** claim fresh full validation passing.
+- The last previously recorded green baseline remains the earlier `82 tests passed` record from the stable validation run before the subsequent deployment-prep changes.
 
 ## Known TODO
 
-- Polish remaining lower-priority CRUD pages for complete visual consistency.
-- Run a dedicated mobile 375px browser pass.
-- Re-run full validation in a stable runtime before deployment checkpoint.
+- Re-run full Laravel and frontend validation in a runtime session that returns clean completion signals.
+- Continue Railway deployment only after stable validation confirmation.
+- Rename local folder to `GBCRMbyCODEX` only after this commit/push flow is safely completed.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 5.2 — Railway Deployment**.
+Proceed to **Checkpoint 5.2 — Railway Deployment** after stable full validation is available.

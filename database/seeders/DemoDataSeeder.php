@@ -18,21 +18,41 @@ use App\Models\PurchaseOrder;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
+        if (! $this->demoSeedEnabled()) {
+            return;
+        }
+
         $users = User::query()->get()->keyBy('email');
+
+        if ($this->seedMode() === 'stress') {
+            $this->seedStressData($users);
+
+            return;
+        }
+
+        $this->seedCuratedDemoData($users);
+    }
+
+    protected function seedCuratedDemoData(Collection $users): void
+    {
         $salesUser = $users->get('sales@blueerp.test');
         $financeUser = $users->get('finance@blueerp.test');
         $operationUser = $users->get('operation@blueerp.test');
         $headPoolUser = $users->get('headpool@blueerp.test');
 
         $pools = Pool::factory()->count(3)->create(['status' => 'active']);
-        $clients = Client::factory()->count(10)->create();
+        $clientCount = $this->demoCustomerCount();
+        $clients = Client::factory()->count($clientCount)->create();
 
-        $clients->each(function (Client $client) use ($salesUser): void {
+        $featuredClients = $clients->take(min(10, $clients->count()));
+        $featuredClients->each(function (Client $client) use ($salesUser): void {
             ClientContact::factory()->count(2)->create(['client_id' => $client->id]);
             MeetingLog::factory()->count(1)->create([
                 'client_id' => $client->id,
@@ -40,7 +60,22 @@ class DemoDataSeeder extends Seeder
             ]);
         });
 
-        MeetingLog::factory()->count(5)->create([
+        $supportingClients = $clients->slice($featuredClients->count())->take(20)->values();
+        $supportingClients->each(function (Client $client, int $index) use ($salesUser): void {
+            ClientContact::factory()->create([
+                'client_id' => $client->id,
+                'is_primary' => true,
+            ]);
+
+            if ($index % 2 === 0) {
+                MeetingLog::factory()->create([
+                    'client_id' => $client->id,
+                    'user_id' => $salesUser?->id,
+                ]);
+            }
+        });
+
+        MeetingLog::factory()->count(max(5, min(15, (int) floor($clientCount / 3))))->create([
             'client_id' => $clients->random()->id,
             'user_id' => $salesUser?->id,
         ]);
@@ -111,7 +146,7 @@ class DemoDataSeeder extends Seeder
 
             $booking = Booking::factory()->create([
                 'booking_number' => 'BK-'.now()->format('Ym').'-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
-                'client_id' => $clients[$index % 10]->id,
+                'client_id' => $clients[$index % $clients->count()]->id,
                 'requested_by' => $salesUser?->id,
                 'pool_id' => $pools[$index % 3]->id,
                 'vehicle_id' => $vehicle?->id,
@@ -137,20 +172,201 @@ class DemoDataSeeder extends Seeder
             $bookings->push($booking);
         }
 
-        $maintenanceLogs = collect();
-        foreach (range(1, 6) as $index) {
-            $status = match ($index) {
+        $this->seedMaintenanceLogs($vehicles, $operationUser?->id);
+        $purchaseOrders = $this->seedPurchaseOrders($bookings, $financeUser?->id, 10, 8);
+        $invoices = $this->seedInvoices($purchaseOrders, 8);
+        $vouchers = $this->seedEVouchers($clients);
+        $this->seedPayments($invoices, $vouchers, $financeUser?->id, 8);
+    }
+
+    protected function seedStressData(Collection $users): void
+    {
+        $salesUser = $users->get('sales@blueerp.test');
+        $financeUser = $users->get('finance@blueerp.test');
+        $operationUser = $users->get('operation@blueerp.test');
+        $headPoolUser = $users->get('headpool@blueerp.test');
+
+        $pools = Pool::factory()->count(3)->create(['status' => 'active']);
+        $clientCount = $this->stressCustomerCount();
+        $timestamp = now();
+        $clientRows = [];
+        $tiers = ['bronze', 'silver', 'gold', 'platinum'];
+        $industries = ['logistics', 'technology', 'manufacturing', 'retail', 'services'];
+        $statuses = ['active', 'active', 'active', 'prospect', 'inactive'];
+
+        foreach (range(1, $clientCount) as $index) {
+            $label = str_pad((string) $index, 6, '0', STR_PAD_LEFT);
+            $clientRows[] = [
+                'code' => 'CL-STRESS-'.$label,
+                'name' => 'Stress Client '.$label,
+                'legal_name' => 'Stress Client '.$label.' LLC',
+                'tier' => $tiers[$index % count($tiers)],
+                'industry' => $industries[$index % count($industries)],
+                'tax_number' => 'NPWP-'.str_pad((string) $index, 10, '0', STR_PAD_LEFT),
+                'billing_address' => 'Stress Street '.$index.', Jakarta',
+                'status' => $statuses[$index % count($statuses)],
+                'notes' => $index % 12 === 0 ? 'High volume seeded account' : null,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+
+            if (count($clientRows) === 300) {
+                DB::table('clients')->insert($clientRows);
+                $clientRows = [];
+            }
+        }
+
+        if ($clientRows !== []) {
+            DB::table('clients')->insert($clientRows);
+        }
+
+        $clients = Client::query()->orderBy('id')->get(['id']);
+        $clientIds = $clients->pluck('id')->all();
+
+        $contactCount = min(250, max(150, (int) floor($clientCount * 0.17)));
+        $contactRows = [];
+        foreach (range(1, $contactCount) as $index) {
+            $clientId = $clientIds[$index - 1];
+            $contactRows[] = [
+                'client_id' => $clientId,
+                'name' => 'PIC Stress '.$index,
+                'position' => $index % 3 === 0 ? 'Procurement' : 'Operations',
+                'phone' => '+62-811-'.str_pad((string) (700000 + $index), 6, '0', STR_PAD_LEFT),
+                'email' => 'stress-pic-'.$index.'@blueerp.test',
+                'is_primary' => true,
+                'notes' => $index % 10 === 0 ? 'Bulk seeded contact' : null,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+        }
+        DB::table('client_contacts')->insert($contactRows);
+
+        $meetingCount = min(200, max(100, (int) floor($clientCount * 0.1)));
+        $meetingRows = [];
+        foreach (range(1, $meetingCount) as $index) {
+            $clientId = $clientIds[$index % count($clientIds)];
+            $meetingRows[] = [
+                'client_id' => $clientId,
+                'user_id' => $salesUser?->id,
+                'meeting_date' => now()->subDays($index % 30)->toDateString(),
+                'title' => 'Stress follow up '.$index,
+                'outcome' => ['prospecting', 'follow_up', 'negotiation', 'closed_won'][$index % 4],
+                'notes' => 'Seeded meeting log for performance dataset',
+                'next_follow_up_at' => now()->addDays(($index % 14) + 1),
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+        }
+        DB::table('meeting_logs')->insert($meetingRows);
+
+        $vehicles = collect();
+        foreach (range(1, 20) as $index) {
+            $status = match (true) {
+                $index >= 17 && $index <= 18 => 'po',
+                $index === 19 => 'maintenance',
+                $index === 20 => 'hold',
+                default => 'available',
+            };
+
+            $vehicles->push(Vehicle::factory()->create([
+                'pool_id' => $pools[($index - 1) % 3]->id,
+                'status' => $status,
+            ]));
+        }
+
+        $drivers = collect();
+        foreach (range(1, 12) as $index) {
+            $drivers->push(Driver::factory()->create([
+                'pool_id' => $pools[($index - 1) % 3]->id,
+                'status' => match ($index) {
+                    10 => 'sick',
+                    11 => 'on_leave',
+                    12 => 'inactive',
+                    default => 'active',
+                },
+                'license_expired_at' => match ($index) {
+                    1 => now()->subDays(3)->toDateString(),
+                    2 => now()->addDays(15)->toDateString(),
+                    default => now()->addMonths(8)->toDateString(),
+                },
+            ]));
+        }
+
+        foreach (range(0, 11) as $index) {
+            DriverAttendance::factory()->create([
+                'driver_id' => $drivers[$index]->id,
+                'attendance_date' => today()->subDays($index % 5),
+                'status' => match ($index) {
+                    9 => 'sick',
+                    10 => 'leave',
+                    11 => 'absent',
+                    default => 'present',
+                },
+            ]);
+        }
+
+        $bookings = collect();
+        $bookingStatuses = array_merge(
+            array_fill(0, 20, 'pending'),
+            array_fill(0, 15, 'assigned'),
+            array_fill(0, 15, 'confirmed'),
+            array_fill(0, 10, 'completed'),
+        );
+
+        foreach ($bookingStatuses as $index => $status) {
+            $vehicle = in_array($status, ['assigned', 'confirmed', 'completed'], true)
+                ? $vehicles[$index % 16]
+                : null;
+            $driver = in_array($status, ['assigned', 'confirmed', 'completed'], true)
+                ? $drivers[$index % 9]
+                : null;
+
+            $booking = Booking::factory()->create([
+                'booking_number' => 'BK-'.now()->format('Ym').'-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
+                'client_id' => $clientIds[$index % count($clientIds)],
+                'requested_by' => $salesUser?->id,
+                'pool_id' => $pools[$index % 3]->id,
+                'vehicle_id' => $vehicle?->id,
+                'driver_id' => $driver?->id,
+                'status' => $status,
+                'start_datetime' => now()->addDays(($index % 20) + 1)->addHours($index % 6),
+                'end_datetime' => now()->addDays(($index % 20) + 1)->addHours(($index % 6) + 4),
+            ]);
+
+            if ($driver && $vehicle) {
+                DriverAssignment::factory()->create([
+                    'booking_id' => $booking->id,
+                    'vehicle_id' => $vehicle->id,
+                    'driver_id' => $driver->id,
+                    'assigned_by' => $headPoolUser?->id,
+                ]);
+            }
+
+            $bookings->push($booking);
+        }
+
+        $this->seedMaintenanceLogs($vehicles, $operationUser?->id, 8);
+        $purchaseOrders = $this->seedPurchaseOrders($bookings, $financeUser?->id, 45, 40);
+        $invoices = $this->seedInvoices($purchaseOrders, 40);
+        $vouchers = $this->seedEVouchers(Client::query()->take(8)->get(), 8);
+        $this->seedPayments($invoices, $vouchers, $financeUser?->id, 36);
+    }
+
+    protected function seedMaintenanceLogs(Collection $vehicles, ?int $reportedBy, int $count = 6): void
+    {
+        foreach (range(1, $count) as $index) {
+            $status = match ($index % 6) {
                 1 => 'in_progress',
                 2 => 'scheduled',
                 3, 4 => 'completed',
                 default => 'cancelled',
             };
 
-            $vehicle = $vehicles[10 + (($index - 1) % 5)];
+            $vehicle = $vehicles[min($vehicles->count() - 1, 10 + (($index - 1) % max(1, $vehicles->count() - 10)))];
 
-            $log = MaintenanceLog::factory()->create([
+            MaintenanceLog::factory()->create([
                 'vehicle_id' => $vehicle->id,
-                'reported_by' => $operationUser?->id,
+                'reported_by' => $reportedBy,
                 'status' => $status,
                 'title' => 'Maintenance #'.$index,
             ]);
@@ -160,18 +376,25 @@ class DemoDataSeeder extends Seeder
             } elseif ($vehicle->status === 'maintenance') {
                 $vehicle->update(['status' => 'available']);
             }
-
-            $maintenanceLogs->push($log);
         }
+    }
+
+    protected function seedPurchaseOrders(Collection $bookings, ?int $approvedBy, int $count, int $invoicedCount): Collection
+    {
+        $eligibleBookings = $bookings
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->values();
 
         $purchaseOrders = collect();
-        foreach (range(1, 10) as $index) {
-            $booking = $bookings[$index % $bookings->count()];
-            $poStatus = $index <= 8 ? ($index <= 6 ? 'invoiced' : 'approved') : 'pending';
+        foreach (range(1, min($count, $eligibleBookings->count())) as $index) {
+            $booking = $eligibleBookings[$index - 1];
+            $poStatus = $index <= $invoicedCount
+                ? 'invoiced'
+                : ($index <= $count - 5 ? 'approved' : 'pending');
             $subtotal = 1000000 + ($index * 100000);
             $tax = round($subtotal * 0.11, 2);
 
-            $po = PurchaseOrder::query()->create([
+            $purchaseOrders->push(PurchaseOrder::query()->create([
                 'po_number' => 'PO-'.now()->format('Ym').'-'.str_pad((string) $index, 4, '0', STR_PAD_LEFT),
                 'booking_id' => $booking->id,
                 'client_id' => $booking->client_id,
@@ -179,26 +402,24 @@ class DemoDataSeeder extends Seeder
                 'subtotal' => $subtotal,
                 'tax' => $tax,
                 'total' => $subtotal + $tax,
-                'approved_by' => in_array($poStatus, ['approved', 'invoiced'], true) ? $financeUser?->id : null,
+                'approved_by' => in_array($poStatus, ['approved', 'invoiced'], true) ? $approvedBy : null,
                 'approved_at' => in_array($poStatus, ['approved', 'invoiced'], true) ? now() : null,
-            ]);
-
-            $purchaseOrders->push($po);
+            ]));
         }
 
-        $invoices = collect();
-        foreach (range(1, 8) as $index) {
-            $po = $purchaseOrders[$index - 1];
-            $status = match ($index) {
-                1 => 'partial',
-                2 => 'paid',
-                3 => 'overdue',
-                4, 5 => 'sent',
-                6 => 'partial',
-                default => 'draft',
-            };
+        return $purchaseOrders;
+    }
 
-            $invoice = Invoice::query()->create([
+    protected function seedInvoices(Collection $purchaseOrders, int $count): Collection
+    {
+        $statusSequence = ['partial', 'paid', 'overdue', 'sent', 'sent', 'partial', 'draft', 'draft'];
+        $invoices = collect();
+
+        foreach (range(1, min($count, $purchaseOrders->count())) as $index) {
+            $po = $purchaseOrders[$index - 1];
+            $status = $statusSequence[($index - 1) % count($statusSequence)];
+
+            $invoices->push(Invoice::query()->create([
                 'invoice_number' => 'INV-'.now()->format('Ym').'-'.str_pad((string) $index, 4, '0', STR_PAD_LEFT),
                 'purchase_order_id' => $po->id,
                 'client_id' => $po->client_id,
@@ -213,56 +434,50 @@ class DemoDataSeeder extends Seeder
                     'paid' => (float) $po->total,
                     default => 0,
                 },
-            ]);
-
-            $invoices->push($invoice);
+            ]));
         }
 
-        $vouchers = collect([
-            EVoucher::factory()->create([
-                'code' => 'EV-'.now()->format('Ym').'-0001',
-                'client_id' => $clients[0]->id,
-                'status' => 'active',
-                'amount' => 500000,
-                'used_amount' => 0,
-                'expired_at' => now()->addDays(30)->toDateString(),
-            ]),
-            EVoucher::factory()->create([
-                'code' => 'EV-'.now()->format('Ym').'-0002',
-                'client_id' => $clients[1]->id,
-                'status' => 'used',
-                'amount' => 300000,
-                'used_amount' => 300000,
-                'expired_at' => now()->addDays(20)->toDateString(),
-                'used_at' => now()->subDay(),
-            ]),
-            EVoucher::factory()->create([
-                'code' => 'EV-'.now()->format('Ym').'-0003',
-                'client_id' => $clients[2]->id,
-                'status' => 'expired',
-                'amount' => 400000,
-                'used_amount' => 0,
-                'expired_at' => now()->subDay()->toDateString(),
-            ]),
-            EVoucher::factory()->create([
-                'code' => 'EV-'.now()->format('Ym').'-0004',
-                'client_id' => null,
-                'status' => 'active',
-                'amount' => 750000,
-                'used_amount' => 100000,
-                'expired_at' => now()->addDays(45)->toDateString(),
-            ]),
-            EVoucher::factory()->create([
-                'code' => 'EV-'.now()->format('Ym').'-0005',
-                'client_id' => $clients[3]->id,
-                'status' => 'cancelled',
-                'amount' => 250000,
-                'used_amount' => 0,
-                'expired_at' => now()->addDays(60)->toDateString(),
-            ]),
-        ]);
+        return $invoices;
+    }
 
-        foreach (range(1, 8) as $index) {
+    protected function seedEVouchers(Collection $clients, int $count = 5): Collection
+    {
+        $clientCollection = $clients->values();
+
+        return collect(range(1, $count))->map(function (int $index) use ($clientCollection) {
+            $status = match ($index) {
+                1 => 'active',
+                2 => 'used',
+                3 => 'expired',
+                4 => 'active',
+                5 => 'cancelled',
+                default => $index % 2 === 0 ? 'active' : 'used',
+            };
+
+            $amount = 250000 + ($index * 100000);
+            $usedAmount = match ($status) {
+                'used' => $amount,
+                default => $index === 4 ? 100000 : 0,
+            };
+
+            return EVoucher::factory()->create([
+                'code' => 'EV-'.now()->format('Ym').'-'.str_pad((string) $index, 4, '0', STR_PAD_LEFT),
+                'client_id' => $index === 4 ? null : $clientCollection[($index - 1) % max(1, $clientCollection->count())]?->id,
+                'status' => $status,
+                'amount' => $amount,
+                'used_amount' => $usedAmount,
+                'expired_at' => match ($status) {
+                    'expired' => now()->subDay()->toDateString(),
+                    default => now()->addDays(15 + ($index * 5))->toDateString(),
+                },
+                'used_at' => $status === 'used' ? now()->subDay() : null,
+            ]);
+        });
+    }
+
+    protected function seedPayments(Collection $invoices, Collection $vouchers, ?int $createdBy, int $count): void
+    {
+        foreach (range(1, min($count, $invoices->count())) as $index) {
             $invoice = $invoices[$index - 1];
             $amount = match ($invoice->status) {
                 'partial' => round((float) $invoice->total / 2, 2),
@@ -271,10 +486,14 @@ class DemoDataSeeder extends Seeder
             };
 
             $method = $index === 6 ? 'evoucher' : 'bank_transfer';
-            $voucher = $method === 'evoucher' ? $vouchers[0] : null;
+            $voucher = $method === 'evoucher' ? $vouchers->firstWhere('status', 'active') : null;
 
             if ($voucher) {
                 $voucher->used_amount = (float) $voucher->used_amount + $amount;
+                if ($voucher->used_amount >= (float) $voucher->amount) {
+                    $voucher->status = 'used';
+                    $voucher->used_at = now();
+                }
                 $voucher->save();
             }
 
@@ -287,8 +506,58 @@ class DemoDataSeeder extends Seeder
                 'method' => $method,
                 'reference_number' => 'REF-'.$index,
                 'notes' => 'Demo payment '.$index,
-                'created_by' => $financeUser?->id,
+                'created_by' => $createdBy,
             ]);
         }
+    }
+
+    protected function demoSeedEnabled(): bool
+    {
+        $explicit = $this->envBool('ENABLE_DEMO_SEED');
+
+        if (app()->environment('production')) {
+            return $explicit ?? false;
+        }
+
+        return $explicit ?? true;
+    }
+
+    protected function seedMode(): string
+    {
+        $mode = strtolower((string) env('DEMO_SEED_MODE', 'demo'));
+
+        return in_array($mode, ['demo', 'stress'], true) ? $mode : 'demo';
+    }
+
+    protected function demoCustomerCount(): int
+    {
+        return max(10, min(50, $this->envInt('DEMO_CUSTOMER_COUNT', 50)));
+    }
+
+    protected function stressCustomerCount(): int
+    {
+        return max(1000, $this->envInt('DEMO_CUSTOMER_COUNT', 1200));
+    }
+
+    protected function envBool(string $key): ?bool
+    {
+        $value = env($key);
+
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+    }
+
+    protected function envInt(string $key, int $default): int
+    {
+        $value = env($key);
+
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        return (int) $value;
     }
 }

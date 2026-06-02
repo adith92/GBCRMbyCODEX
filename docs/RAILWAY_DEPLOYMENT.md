@@ -36,6 +36,8 @@ Minimum variables:
 - `CACHE_STORE=database`
 - `QUEUE_CONNECTION=database`
 - `ENABLE_DEMO_SEED=false`
+- `DEMO_SEED_MODE=demo`
+- `DEMO_CUSTOMER_COUNT=50`
 
 ## Build Command
 
@@ -60,7 +62,19 @@ This script will:
 - clear config, route, and view cache
 - run migrations with `--force`
 - optionally run demo seed only if `ENABLE_DEMO_SEED=true`
+- support `DEMO_SEED_MODE=demo` for curated walkthrough data
+- support `DEMO_SEED_MODE=stress` for larger performance-oriented demo data
 - rebuild production caches
+
+## Seeder Modes
+
+Recommended values:
+
+- stakeholder demo: `ENABLE_DEMO_SEED=true`, `DEMO_SEED_MODE=demo`, `DEMO_CUSTOMER_COUNT=50`
+- performance smoke test: `ENABLE_DEMO_SEED=true`, `DEMO_SEED_MODE=stress`
+- production without demo data: `ENABLE_DEMO_SEED=false`
+
+When `DEMO_SEED_MODE=stress` and `DEMO_CUSTOMER_COUNT` is empty, the seeder defaults to 1200 clients.
 
 ## First Deploy
 

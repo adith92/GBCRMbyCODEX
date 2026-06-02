@@ -102,6 +102,24 @@ Semua akun demo menggunakan password: `password`
 - [docs/DEMO_SCRIPT_PAK_KOBI.md](./docs/DEMO_SCRIPT_PAK_KOBI.md) — script demo stakeholder
 - [docs/QA_CHECKLIST.md](./docs/QA_CHECKLIST.md) — checklist QA internal
 
+## 🌱 Scalable Demo Seeder
+
+Environment variables yang didukung:
+
+- `ENABLE_DEMO_SEED=true/false`
+- `DEMO_SEED_MODE=demo|stress`
+- `DEMO_CUSTOMER_COUNT=50` untuk demo mode, atau `1200` default efektif untuk stress mode bila tidak diisi
+
+Mode yang tersedia:
+
+- `demo`: curated dataset untuk flow presentasi, dengan sekitar 10-50 client dan data operasional yang tetap realistis.
+- `stress`: dataset besar untuk uji pagination, search, dan performa awal. Default menghasilkan minimal 1200 client, 150-250 contact, 100-200 meeting log, 50-100 booking, dan 30-60 invoice.
+
+Rekomendasi penggunaan:
+
+- Demo stakeholder: `DEMO_SEED_MODE=demo` ✅
+- Uji performa awal: `DEMO_SEED_MODE=stress` ⚡
+
 ## 🧪 Status Saat Ini
 
 - Checkpoint audit demo: `PHASE-4.2-DEMO-AUDIT-PASSED`
@@ -150,11 +168,17 @@ sh railway/init-app.sh
 
 7. Generate a public Railway domain
 8. Set `APP_URL` to that Railway domain
-9. If you want seeded demo data, set:
+9. If you want seeded data, set the seed flags:
 
 ```bash
 ENABLE_DEMO_SEED=true
+DEMO_SEED_MODE=demo
+DEMO_CUSTOMER_COUNT=50
 ```
+
+Use `DEMO_SEED_MODE=demo` for normal stakeholder walkthroughs.
+Use `DEMO_SEED_MODE=stress` for heavier pagination/search validation.
+When stress mode is enabled and `DEMO_CUSTOMER_COUNT` is empty, the seeder defaults to 1200 clients.
 
 ### Smoke Test Checklist
 
