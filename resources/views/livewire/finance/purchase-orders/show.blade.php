@@ -39,7 +39,13 @@
         <form wire:submit="createInvoice" class="grid gap-4 md:grid-cols-3">
             <select wire:model="invoice_action" class="ui-select"><option value="draft">Create as Draft</option><option value="sent">Create and Mark Sent</option></select>
             <input wire:model="due_at" type="date" class="ui-input">
-            <div class="text-right"><x-ui.action-button type="submit" variant="primary" @disabled(!auth()->user()->can('invoices.create'))>Create Invoice</x-ui.action-button></div>
+            <div class="text-right">
+                @if(auth()->user()->can('invoices.create'))
+                    <x-ui.action-button type="submit" variant="primary">Create Invoice</x-ui.action-button>
+                @else
+                    <x-ui.action-button type="button" variant="secondary">Create Invoice</x-ui.action-button>
+                @endif
+            </div>
         </form>
         @if($purchaseOrder->invoices->isNotEmpty())
             <div class="mt-5 space-y-3 text-sm">

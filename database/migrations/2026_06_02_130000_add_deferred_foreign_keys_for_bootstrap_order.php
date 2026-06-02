@@ -9,6 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if ($this->usesSqlite()) {
+            return;
+        }
+
         Schema::table('client_contacts', function (Blueprint $table): void {
             if (! $this->foreignKeyExists('client_contacts', 'client_contacts_client_id_foreign')) {
                 $table->foreign('client_id')->references('id')->on('clients')->cascadeOnUpdate()->cascadeOnDelete();
@@ -42,6 +46,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if ($this->usesSqlite()) {
+            return;
+        }
+
         Schema::table('driver_assignments', function (Blueprint $table): void {
             if ($this->foreignKeyExists('driver_assignments', 'driver_assignments_booking_id_foreign')) {
                 $table->dropForeign('driver_assignments_booking_id_foreign');
@@ -82,5 +90,10 @@ return new class extends Migration
             ->where('table_name', $table)
             ->where('constraint_name', $constraint)
             ->exists();
+    }
+
+    private function usesSqlite(): bool
+    {
+        return Schema::getConnection()->getDriverName() === 'sqlite';
     }
 };
