@@ -93,13 +93,16 @@ Notes:
 
 - This checkpoint update does **not** claim fresh full validation passing.
 - The last previously recorded green baseline remains the earlier `82 tests passed` record from the stable validation run before the subsequent deployment-prep changes.
+- Railway deploy is now in progress.
+- PHP 8.4 runtime alignment has been identified and fixed in local deployment config.
+- Railway migration startup is still pending deterministic stabilization before `PHASE-5.2` can be claimed complete.
 
 ## Known TODO
 
 - Re-run full Laravel and frontend validation in a runtime session that returns clean completion signals.
-- Continue Railway deployment only after stable validation confirmation.
-- Rename local folder to `GBCRMbyCODEX` only after this commit/push flow is safely completed.
+- Complete Railway startup stabilization so migrations and demo seeding run deterministically.
+- Rename local folder to `GBCRMbyCODEX` only after deployment flow is safely completed.
 
 ## Next Recommended Checkpoint
 
-Proceed to **Checkpoint 5.2 — Railway Deployment** after stable full validation is available.
+Proceed to **Checkpoint 5.2 — Railway Deployment** after stable startup and smoke test confirmation are available.
