@@ -4,7 +4,9 @@ Semua perubahan penting di repo ini dicatat di file ini.
 
 ## [7.3] - 2026-06-03
 
-- Placeholder untuk final handoff pack phase 7.
+- Menambahkan `docs/FINAL_DEMO_REVIEW_PACK.md` sebagai ringkasan handoff final.
+- Menyelaraskan README, checkpoint, dan summary docs ke status final phase 7.
+- Menutup roadmap praktis demo-ready + deploy-ready untuk versi saat ini.
 
 ## [7.2] - 2026-06-03
 

@@ -15,7 +15,7 @@
 - GitHub: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
 - Branch utama: `main`
 - Live demo Railway: [gbdemo01.up.railway.app](https://gbdemo01.up.railway.app)
-- Checkpoint platform terakhir: `PHASE-7.2-RAILWAY-REFRESH-SMOKE-REVALIDATED`
+- Checkpoint platform terakhir: `PHASE-7.3-FINAL-DEMO-REVIEW-PACK-COMPLETE`
 - Upgrade UI/UX saat ini: `Checkpoint 6.1 + 7.1`
 
 ## 🧱 Stack Final
@@ -146,6 +146,8 @@ Rekomendasi penggunaan:
   - [docs/FULL_BUILD_SUMMARY.md](./docs/FULL_BUILD_SUMMARY.md)
 - Changelog checkpoint:
   - [CHANGELOG.md](./CHANGELOG.md)
+- Final review pack:
+  - [docs/FINAL_DEMO_REVIEW_PACK.md](./docs/FINAL_DEMO_REVIEW_PACK.md)
 
 ## ⚠️ Prinsip Penting
 
