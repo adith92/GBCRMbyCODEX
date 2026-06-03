@@ -5,7 +5,6 @@ php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 php artisan migrate --force
-php artisan db:seed --class=RbacSeeder --force
 
 if [ "${ENABLE_DEMO_SEED}" = "true" ]; then
   DEMO_CLIENT_COUNT=$(php -r '
@@ -17,10 +16,13 @@ echo Illuminate\Support\Facades\Schema::hasTable("clients") ? (int) App\Models\C
 ')
 
   if [ "${DEMO_CLIENT_COUNT}" = "0" ]; then
-    php artisan db:seed --class=DemoDataSeeder --force
+    php artisan db:seed --class=DatabaseSeeder --force
   else
+    php artisan db:seed --class=RbacSeeder --force
     echo "Skipping demo seed because clients table already contains data (${DEMO_CLIENT_COUNT})."
   fi
+else
+  php artisan db:seed --class=RbacSeeder --force
 fi
 
 php artisan config:cache
