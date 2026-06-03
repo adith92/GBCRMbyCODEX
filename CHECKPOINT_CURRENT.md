@@ -9,6 +9,12 @@
 
 ## Completed Work
 
+### Minor Update — Demo Client Scale Increase
+
+- Default jumlah client untuk `demo` mode dinaikkan menjadi **1000+**.
+- Default `DEMO_CUSTOMER_COUNT` sekarang `1200`.
+- Perubahan ini menjaga demo environment tetap kaya data tanpa harus pindah ke `stress` mode.
+
 ### UX Premium Upgrade
 
 - Mengubah shell utama menjadi **command center premium** dengan:

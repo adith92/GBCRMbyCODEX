@@ -36,7 +36,7 @@ Minimum variables:
 - `QUEUE_CONNECTION=database`
 - `ENABLE_DEMO_SEED=false`
 - `DEMO_SEED_MODE=demo`
-- `DEMO_CUSTOMER_COUNT=50`
+- `DEMO_CUSTOMER_COUNT=1200`
 
 ## Build Command
 
@@ -72,7 +72,7 @@ This script will:
 
 Recommended values:
 
-- stakeholder demo: `ENABLE_DEMO_SEED=true`, `DEMO_SEED_MODE=demo`, `DEMO_CUSTOMER_COUNT=50`
+- stakeholder demo: `ENABLE_DEMO_SEED=true`, `DEMO_SEED_MODE=demo`, `DEMO_CUSTOMER_COUNT=1200`
 - performance smoke test: `ENABLE_DEMO_SEED=true`, `DEMO_SEED_MODE=stress`
 - production without demo data: `ENABLE_DEMO_SEED=false`
 

@@ -160,13 +160,13 @@ Environment flags yang didukung:
 
 - `ENABLE_DEMO_SEED=true/false`
 - `DEMO_SEED_MODE=demo|stress`
-- `DEMO_CUSTOMER_COUNT=50`
+- `DEMO_CUSTOMER_COUNT=1200`
 
 Mode:
 
 | Mode | Tujuan | Karakteristik |
 |---|---|---|
-| `demo` | stakeholder walkthrough | curated flow, data realistis, cepat untuk presentasi |
+| `demo` | stakeholder walkthrough | curated flow dengan default 1000+ client, tapi booking/finance tetap realistis dan ringan untuk presentasi |
 | `stress` | early performance test | 1000+ client, search/pagination/load lebih berat |
 
 Rekomendasi:
@@ -206,7 +206,7 @@ Validation terakhir dari clone sehat:
 ```bash
 ENABLE_DEMO_SEED=true
 DEMO_SEED_MODE=demo
-DEMO_CUSTOMER_COUNT=50
+DEMO_CUSTOMER_COUNT=1200
 ```
 
 ### Docs

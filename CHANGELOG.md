@@ -2,6 +2,12 @@
 
 Semua perubahan penting di repo ini dicatat di file ini.
 
+## [8.0.1] - 2026-06-03
+
+- Menaikkan default jumlah client pada `demo` mode menjadi **1000+**.
+- Menyelaraskan `.env.example`, `.env.railway.example`, README, dan docs Railway ke default baru `DEMO_CUSTOMER_COUNT=1200`.
+- Memperbarui test scalable seeder agar memastikan demo mode juga menghasilkan minimal 1000 client.
+
 ## [8.0] - 2026-06-03
 
 - Mendorong BBCodex ke arah **production-grade backend + premium UX** tanpa mengubah stack utama.

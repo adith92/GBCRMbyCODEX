@@ -21,17 +21,16 @@ class ScalableDemoSeederTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_demo_seed_mode_creates_at_least_ten_clients(): void
+    public function test_demo_seed_mode_creates_at_least_one_thousand_clients(): void
     {
         $this->setDemoSeedEnv([
             'ENABLE_DEMO_SEED' => 'true',
             'DEMO_SEED_MODE' => 'demo',
-            'DEMO_CUSTOMER_COUNT' => '15',
         ]);
 
         $this->seed(DatabaseSeeder::class);
 
-        $this->assertGreaterThanOrEqual(10, Client::query()->count());
+        $this->assertGreaterThanOrEqual(1000, Client::query()->count());
     }
 
     public function test_stress_seed_mode_creates_at_least_one_thousand_clients(): void

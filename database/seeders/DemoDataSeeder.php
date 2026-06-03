@@ -557,7 +557,7 @@ class DemoDataSeeder extends Seeder
 
     protected function demoCustomerCount(): int
     {
-        return max(10, min(50, $this->envInt('DEMO_CUSTOMER_COUNT', 50)));
+        return max(1000, $this->envInt('DEMO_CUSTOMER_COUNT', 1200));
     }
 
     protected function stressCustomerCount(): int
