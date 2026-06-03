@@ -48,13 +48,15 @@ npm install
 npm run build
 ```
 
-## Pre-Deploy Command
+## Startup Command
 
-Recommended pre-deploy command:
+Recommended Railway start command:
 
 ```bash
 sh railway/init-app.sh
 ```
+
+In this repo, `nixpacks.toml` chains that script before `php artisan serve`, so every fresh boot or redeploy will safely run the startup preparation first.
 
 This script will:
 
