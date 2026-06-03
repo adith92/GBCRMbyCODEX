@@ -2,12 +2,15 @@
 
 use App\Http\Controllers\ClientContactController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DemoEnvironmentController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\MeetingLogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\VendorPartnerController;
 use App\Http\Controllers\VehicleController;
 use App\Livewire\Admin\Hr\Attendance as HrAttendance;
 use App\Livewire\Admin\Hr\Drivers as HrDrivers;
@@ -49,6 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/activity', ActivityController::class)->name('activity.index');
     Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
     Route::get('/sales/{user}/performance', [SalesController::class, 'performance'])->name('sales.performance');
+    Route::post('/demo/switch-role', [DemoEnvironmentController::class, 'switchRole'])->name('demo.switch-role');
+    Route::post('/demo/reset', [DemoEnvironmentController::class, 'reset'])->name('demo.reset');
 
     Route::prefix('/crm')->name('crm.')->group(function (): void {
         Route::get('/', fn () => redirect()->route('crm.clients.index'))
@@ -86,6 +91,18 @@ Route::middleware('auth')->group(function () {
             ->middlewareFor(['create', 'store'], 'permission:vehicles.create')
             ->middlewareFor(['edit', 'update'], 'permission:vehicles.update')
             ->middlewareFor(['destroy'], 'permission:vehicles.delete');
+    });
+
+    Route::prefix('/partners')->name('partners.')->group(function (): void {
+        Route::get('/', fn () => redirect()->route('partners.vendors.index'))
+            ->middleware('permission:clients.view')
+            ->name('index');
+
+        Route::resource('vendors', VendorPartnerController::class)
+            ->parameter('vendors', 'vendor')
+            ->middlewareFor(['index', 'show'], 'permission:clients.view')
+            ->middlewareFor(['create', 'store'], 'permission:clients.create')
+            ->middlewareFor(['edit', 'update'], 'permission:clients.update');
     });
 
     Route::resource('/drivers', DriverController::class)
@@ -148,10 +165,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/{maintenanceLog}/edit', MaintenanceEdit::class)->middleware('permission:maintenance.update')->name('edit');
     });
 
-    Route::view('/reports', 'module-placeholder', [
-        'header' => 'Reports Module',
-        'message' => 'Checkpoint placeholder. Reporting dashboard and exports start in Phase 3.1.',
-    ])->middleware('permission:reports.view')->name('reports.index');
+    Route::get('/reports', ReportsController::class)
+        ->middleware('permission:reports.view')
+        ->name('reports.index');
 
     Route::prefix('/admin/hr')->name('admin.hr.')->middleware('role:super-admin')->group(function (): void {
         Route::get('/', fn () => redirect()->route('admin.hr.drivers'))->name('index');

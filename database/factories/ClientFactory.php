@@ -15,7 +15,7 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => strtoupper(fake()->bothify('CL###??')),
+            'code' => strtoupper(fake()->unique()->bothify('CL###??')),
             'name' => fake()->company(),
             'legal_name' => fake()->company().' Ltd',
             'tier' => fake()->randomElement(['bronze', 'silver', 'gold', 'platinum']),

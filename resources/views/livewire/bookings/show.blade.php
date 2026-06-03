@@ -5,7 +5,7 @@
         ['label' => $booking->booking_number, 'url' => route('bookings.show', $booking)],
     ]" />
 
-    <x-ui.page-header :title="$booking->booking_number" eyebrow="Booking Detail" description="Review commercial context, assignment readiness, linked finance documents, and dispatch history.">
+    <x-ui.page-header :title="$booking->booking_number" eyebrow="Booking Detail" description="Review commercial context, assignment readiness, linked finance documents, dan audit dispatch history dari satu layar.">
         <x-slot:actions>
             <x-ui.status-badge :status="$booking->status" />
             <x-back-link :fallback="route('bookings.index')" />
@@ -17,47 +17,74 @@
     @endif
 
     <section class="grid gap-4 md:grid-cols-3">
-        <x-ui.stat-card label="Client" :value="$booking->client?->name ?? '-'" hint="Commercial owner of this request." tone="blue" />
-        <x-ui.stat-card label="Assignment History" :value="$booking->driverAssignments->count()" hint="Number of assignment changes recorded for this booking." tone="emerald" />
-        <x-ui.stat-card label="Finance Docs" :value="$booking->purchaseOrders->count() + $booking->purchaseOrders->flatMap->invoices->count()" hint="Linked purchase orders and invoices for this booking." tone="amber" />
+        <x-ui.stat-card label="Client" :value="$booking->client?->name ?? '-'" hint="👥 owner request" tone="blue" />
+        <x-ui.stat-card label="Assignment History" :value="$booking->driverAssignments->count()" hint="🧭 audit trail" tone="emerald" />
+        <x-ui.stat-card label="Finance Docs" :value="$booking->purchaseOrders->count() + $booking->purchaseOrders->flatMap->invoices->count()" hint="🧾 linked docs" tone="amber" />
     </section>
 
-    <x-ui.form-card title="Booking snapshot" description="Core operational and commercial data for this request.">
-        <dl class="ui-meta-grid">
-            <div class="ui-meta-item"><dt>Booking Number</dt><dd>{{ $booking->booking_number }}</dd></div>
-            <div class="ui-meta-item"><dt>Status</dt><dd><x-ui.status-badge :status="$booking->status" /></dd></div>
-            <div class="ui-meta-item"><dt>Client</dt><dd>@if($booking->client)<a href="{{ route('crm.clients.show', $booking->client) }}" class="ui-link">{{ $booking->client->name }}</a>@else - @endif</dd></div>
-            <div class="ui-meta-item"><dt>Pool</dt><dd>{{ $booking->pool?->name ?? '-' }}</dd></div>
-            <div class="ui-meta-item"><dt>Vehicle</dt><dd>@if($booking->vehicle)<a href="{{ route('fleet.vehicles.show', $booking->vehicle) }}" class="ui-link">{{ $booking->vehicle->plate_number }}</a>@else - @endif</dd></div>
-            <div class="ui-meta-item"><dt>Driver</dt><dd>@if($booking->driver)<a href="{{ route('drivers.show', $booking->driver) }}" class="ui-link">{{ $booking->driver->name }}</a>@else - @endif</dd></div>
-            <div class="ui-meta-item"><dt>Start</dt><dd>{{ $booking->start_datetime?->format('Y-m-d H:i') }}</dd></div>
-            <div class="ui-meta-item"><dt>End</dt><dd>{{ $booking->end_datetime?->format('Y-m-d H:i') }}</dd></div>
-            <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Pickup</dt><dd>{{ $booking->pickup_location ?: '-' }}</dd></div>
-            <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Destination</dt><dd>{{ $booking->destination ?: '-' }}</dd></div>
-            <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Notes</dt><dd>{{ $booking->notes ?: '-' }}</dd></div>
-        </dl>
+    <section class="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+        <x-ui.form-card title="Booking snapshot" description="Core operational dan commercial data untuk request ini.">
+            <dl class="ui-meta-grid">
+                <div class="ui-meta-item"><dt>Booking Number</dt><dd>{{ $booking->booking_number }}</dd></div>
+                <div class="ui-meta-item"><dt>Status</dt><dd><x-ui.status-badge :status="$booking->status" /></dd></div>
+                <div class="ui-meta-item"><dt>Client</dt><dd>@if($booking->client)<a href="{{ route('crm.clients.show', $booking->client) }}" class="ui-link">{{ $booking->client->name }}</a>@else - @endif</dd></div>
+                <div class="ui-meta-item"><dt>Pool</dt><dd>{{ $booking->pool?->name ?? '-' }}</dd></div>
+                <div class="ui-meta-item"><dt>Vehicle</dt><dd>@if($booking->vehicle)<a href="{{ route('fleet.vehicles.show', $booking->vehicle) }}" class="ui-link">{{ $booking->vehicle->plate_number }}</a>@else - @endif</dd></div>
+                <div class="ui-meta-item"><dt>Driver</dt><dd>@if($booking->driver)<a href="{{ route('drivers.show', $booking->driver) }}" class="ui-link">{{ $booking->driver->name }}</a>@else - @endif</dd></div>
+                <div class="ui-meta-item"><dt>Start</dt><dd>{{ $booking->start_datetime?->format('Y-m-d H:i') }}</dd></div>
+                <div class="ui-meta-item"><dt>End</dt><dd>{{ $booking->end_datetime?->format('Y-m-d H:i') }}</dd></div>
+                <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Pickup</dt><dd>{{ $booking->pickup_location ?: '-' }}</dd></div>
+                <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Destination</dt><dd>{{ $booking->destination ?: '-' }}</dd></div>
+                <div class="ui-meta-item md:col-span-2 xl:col-span-3"><dt>Notes</dt><dd>{{ $booking->notes ?: '-' }}</dd></div>
+            </dl>
 
-        <div class="mt-5 flex flex-wrap gap-3">
-            @can('bookings.update')
-                <x-ui.action-button :href="route('bookings.edit', $booking)" variant="secondary">Edit</x-ui.action-button>
-            @endcan
-            @can('pool.assign-driver')
-                @if (in_array($booking->status, ['pending', 'assigned'], true))
-                    <x-ui.action-button :href="route('pool.assign', $booking)" variant="primary">Assign Driver & Vehicle</x-ui.action-button>
-                @endif
-            @endcan
-            @can('bookings.approve')
-                @if ($booking->status === 'assigned')
-                    <x-ui.action-button wire:click="confirm" wire:confirm="Confirm this booking?" variant="success">Confirm Booking</x-ui.action-button>
-                @endif
-            @endcan
-            @can('bookings.cancel')
-                @if (in_array($booking->status, ['pending', 'assigned', 'confirmed'], true))
-                    <x-ui.action-button wire:click="cancel" wire:confirm="Cancel this booking?" variant="danger">Cancel Booking</x-ui.action-button>
-                @endif
-            @endcan
-        </div>
-    </x-ui.form-card>
+            <div class="mt-5 flex flex-wrap gap-3">
+                @can('bookings.update')
+                    <x-ui.action-button :href="route('bookings.edit', $booking)" variant="secondary">Edit</x-ui.action-button>
+                @endcan
+                @can('pool.assign-driver')
+                    @if (in_array($booking->status, ['pending', 'assigned'], true))
+                        <x-ui.action-button :href="route('pool.assign', $booking)" variant="primary">Assign Driver & Vehicle</x-ui.action-button>
+                    @endif
+                @endcan
+                @can('bookings.approve')
+                    @if ($booking->status === 'assigned')
+                        <x-ui.action-button wire:click="confirm" wire:confirm="Confirm this booking?" variant="success">Confirm Booking</x-ui.action-button>
+                    @endif
+                @endcan
+                @can('bookings.cancel')
+                    @if (in_array($booking->status, ['pending', 'assigned', 'confirmed'], true))
+                        <x-ui.action-button wire:click="cancel" wire:confirm="Cancel this booking?" variant="danger">Cancel Booking</x-ui.action-button>
+                    @endif
+                @endcan
+            </div>
+        </x-ui.form-card>
+
+        <x-ui.table-card title="Dispatch audit trail" description="Visual ringkas perubahan assignment driver dan vehicle untuk booking ini.">
+            @if($booking->driverAssignments->isEmpty())
+                <div class="p-5">
+                    <x-ui.empty-state title="No assignment history yet" description="Trail akan muncul setelah pool mulai assign atau reassign driver dan kendaraan." />
+                </div>
+            @else
+                <div class="ui-timeline space-y-4 p-4">
+                    @foreach($booking->driverAssignments as $assignment)
+                        <div class="ui-timeline-item rounded-[14px] border border-[#E5E7EB] bg-white px-4 py-3">
+                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-[#042C53]">{{ $assignment->driver?->name ?? 'No driver' }} → {{ $assignment->vehicle?->plate_number ?? 'No vehicle' }}</p>
+                                    <p class="mt-1 text-sm text-slate-500">Assigned by {{ $assignment->assignedBy?->name ?? '-' }} · {{ $assignment->assigned_at?->format('Y-m-d H:i') }}</p>
+                                </div>
+                                <span class="rounded-full bg-[#F4F8FD] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#185FA5]">{{ $assignment->released_at ? 'Reassigned' : 'Active' }}</span>
+                            </div>
+                            @if($assignment->released_at)
+                                <p class="mt-2 text-xs text-slate-500">Released at {{ $assignment->released_at->format('Y-m-d H:i') }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </x-ui.table-card>
+    </section>
 
     @if($booking->purchaseOrders->isNotEmpty())
         <x-ui.table-card title="Purchase Orders" description="Finance documents already linked to this booking.">
@@ -94,37 +121,4 @@
             </div>
         </x-ui.table-card>
     @endif
-
-    <x-ui.table-card title="Driver Assignment History" description="Track reassignment and release events for dispatch visibility.">
-        @if($booking->driverAssignments->isEmpty())
-            <div class="p-5">
-                <x-ui.empty-state title="No assignment history yet" description="Assignments will be listed here once the pool team starts dispatching." />
-            </div>
-        @else
-            <div class="ui-table-wrap">
-                <table class="ui-table">
-                    <thead>
-                    <tr>
-                        <th>Assigned At</th>
-                        <th>Driver</th>
-                        <th>Vehicle</th>
-                        <th>By</th>
-                        <th>Released</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($booking->driverAssignments as $assignment)
-                        <tr>
-                            <td>{{ $assignment->assigned_at?->format('Y-m-d H:i') }}</td>
-                            <td>{{ $assignment->driver?->name ?? '-' }}</td>
-                            <td>{{ $assignment->vehicle?->plate_number ?? '-' }}</td>
-                            <td>{{ $assignment->assignedBy?->name ?? '-' }}</td>
-                            <td>{{ $assignment->released_at?->format('Y-m-d H:i') ?? '-' }}</td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </x-ui.table-card>
 </x-layouts.app>

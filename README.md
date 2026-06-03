@@ -1,198 +1,207 @@
-# GBCRMbyCODEX 🚐💼🤖
+# BBCodex / GBCRMbyCODEX 🚖✨📊
 
 ![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![Livewire](https://img.shields.io/badge/Livewire-3-4E56A6?style=for-the-badge&logo=livewire&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Spatie Permission](https://img.shields.io/badge/Spatie-Permission-1F2937?style=for-the-badge)
+![Railway](https://img.shields.io/badge/Railway-Live-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
+![CI](https://img.shields.io/badge/GitHub_Actions-CI_Ready-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Built by Codex](https://img.shields.io/badge/Built%20By-CODEX-111827?style=for-the-badge)
-![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%20Ready-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
-> Sistem CRM, Fleet, Pool Dispatch, Finance, Maintenance, dan HR backend-only untuk kebutuhan demo operasional B2B.  
-> Dibangun oleh **CODEX** dengan stack **Laravel 12 + Livewire 3 + MySQL + Tailwind + Spatie Permission**. ✨
+> **BBCodex** adalah CRM operasional B2B untuk client management, fleet, dispatch, finance, maintenance, dan HR backend-only.  
+> Fondasinya tetap **Laravel 12 + Livewire 3 + MySQL + Spatie Permission**, tetapi rasa UX-nya didorong ke arah **command center premium**: cepat, modern, visual, drill-down friendly, dan tetap aman untuk backend. 💙
 
-## 🌐 Repository
+## 🌐 Repo & Demo
 
-- GitHub: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
-- Branch utama: `main`
-- Live demo Railway: [gbdemo01.up.railway.app](https://gbdemo01.up.railway.app)
-- Checkpoint platform terakhir: `PHASE-7.3-FINAL-DEMO-REVIEW-PACK-COMPLETE`
-- Upgrade UI/UX saat ini: `Checkpoint 6.1 + 7.1`
+| Item | Value |
+|---|---|
+| GitHub | [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX) |
+| Branch utama | `main` |
+| Nama produk | `BBCodex` |
+| Live demo | [gbdemo01.up.railway.app](https://gbdemo01.up.railway.app) |
+| Checkpoint aktif | `PHASE-8.0-PRODUCTION-GRADE-PREMIUM-UX-COMPLETE` |
+| Validation terbaru | `96 tests passed` ✅ |
 
-## 🧱 Stack Final
+## 🧱 Stack Utama
 
 - `Laravel 12`
 - `Livewire 3`
 - `MySQL`
 - `Tailwind CSS`
 - `Spatie Laravel Permission`
+- `GitHub Actions CI`
+- `Railway Deployment`
 
-Kenapa stack ini dipilih? ✅
+## 🎯 Tujuan Produk
 
-- Cepat untuk bangun MVP internal yang kaya CRUD.
-- Cocok untuk RBAC, operasional, dan flow bisnis bertahap.
-- Aman untuk berkembang tanpa rewrite besar terlalu cepat.
-- Pas untuk demo end-to-end sebelum UI polish dan deploy production.
+BBCodex dibangun untuk menyatukan alur berikut dalam satu workspace:
 
-## 🖼️ Gambaran Modul
+- 👥 CRM client + contact + meeting follow-up
+- 🚐 Fleet & vehicle readiness
+- 🧑‍✈️ Driver management
+- 📋 Booking pipeline
+- 🧭 Pool dispatch / assign driver-vehicle
+- 💳 Finance flow end-to-end
+- 🛠️ Maintenance control
+- 🛡️ HR backend-only
+- 🔎 Global search & activity drill-down
+- 📈 Sales performance & reports dashboard
+- 🤝 Partner / Vendor support network
+
+## 🗺️ Architecture Overview
 
 ```mermaid
 flowchart LR
-    A["Auth + RBAC 🔐"] --> B["CRM 👥"]
-    A --> C["Fleet 🚐"]
-    A --> D["Drivers 🧑‍✈️"]
-    B --> E["Bookings 📋"]
+    A["🔐 Auth + RBAC"] --> B["👥 CRM"]
+    A --> C["🚐 Fleet"]
+    A --> D["🧑‍✈️ Drivers"]
+    B --> E["📋 Bookings"]
     C --> E
-    D --> F["Pool Dispatch 🧭"]
+    D --> F["🧭 Pool Dispatch"]
     E --> F
-    F --> G["Purchase Order 💳"]
-    G --> H["Invoice 🧾"]
-    H --> I["Payment 💰"]
-    I --> J["E-Voucher 🎟️"]
-    C --> K["Maintenance 🛠️"]
-    A --> L["HR Backend Only 🛡️"]
-    A --> M["GM Dashboard 📊"]
+    F --> G["💳 Purchase Order"]
+    G --> H["🧾 Invoice"]
+    H --> I["💰 Payment"]
+    I --> J["🎟️ E-Voucher"]
+    C --> K["🛠️ Maintenance"]
+    A --> L["🛡️ HR Backend-only"]
+    A --> M["📊 Reports + Dashboard"]
+    A --> N["🤝 Partner / Vendor"]
 ```
 
-## 🚀 Fitur Utama MVP
+## 🧩 Feature Matrix
 
-- 🔐 Auth + Role Based Access Control
-- 👥 CRM Client + Contacts + Meeting Logs
-- 🚐 Fleet / Vehicle Management
-- 🧑‍✈️ Driver Management
-- 📋 Booking + Dispatch Flow
-- 🧭 Pool Queue + Assign Driver/Vehicle
-- 💳 Purchase Order
-- 🧾 Invoice
-- 💰 Payment Partial / Full
-- 🎟️ E-Voucher
-- 🛠️ Maintenance Flow
-- 🛡️ HR backend-only untuk Super Admin
-- 📊 Dashboard KPI + drill-down
-- 🔎 Global Search lintas modul yang permission-aware
-- 🎯 Search scope filter per modul
-- 🕘 Recent Activity timeline lintas workflow
-- 🧭 Activity filter untuk drill-down yang lebih cepat
-- 🧪 Demo Seeder + QA Docs
+| Module | Status | Catatan |
+|---|---|---|
+| Auth + RBAC | ✅ | Spatie Permission, granular role/permission |
+| CRM Clients | ✅ | Client list, detail, contacts, meeting logs |
+| Partners / Vendors | ✅ | Modul tambahan untuk supplier/workshop/partner support |
+| Fleet Vehicles | ✅ | Index, detail, filter, clickable records |
+| Drivers | ✅ | Index, detail, status/license visibility |
+| Bookings | ✅ | Create, assign, confirm, cancel, finance linkage |
+| Pool Dispatch | ✅ | Queue, assign, guard status, audit trail visual |
+| Purchase Orders | ✅ | Create from confirmed booking, approval flow |
+| Invoices | ✅ | From approved PO, payment integration |
+| Payments | ✅ | Partial/full payment, overpay guard |
+| E-Vouchers | ✅ | Voucher payment support |
+| Maintenance | ✅ | Vehicle state protection + visual timeline |
+| HR Backend-only | ✅ | Super-admin only |
+| Global Search | ✅ | Permission-aware + scope filter + Cmd+K feel |
+| Recent Activity | ✅ | Filtered drill-down timeline |
+| Reports Dashboard | ✅ | Real insight dashboard, bukan placeholder |
+| Sales Performance | ✅ | Roster + performance page |
+| Demo Seeder | ✅ | Demo + stress mode |
+| GitHub CI | ✅ | Install, build, seed, test |
+| Railway Deploy | ✅ | Live demo tersedia |
 
-## 🧭 Demo Flow Utama
+## 👮 Role Matrix Ringkas
 
-1. `GM Dashboard` untuk lihat KPI bisnis 📊
-2. `Sales` buat booking baru 📝
-3. `Pool` assign driver + vehicle 🚐
-4. Booking dikonfirmasi ✅
-5. `Finance` buat PO → Invoice → Payment 💳🧾💰
-6. `E-Voucher` dipakai untuk skenario payment tertentu 🎟️
-7. `Operation` jalankan maintenance kendaraan 🛠️
-8. `Super Admin` buka HR backend-only 🛡️
+| Role | Fokus Utama | Akses Khas |
+|---|---|---|
+| `super-admin` | kontrol penuh | semua modul + HR |
+| `gm` | executive overview | dashboard, reports, finance visibility, sales performance |
+| `sales-manager` | pipeline & team | clients, meeting logs, bookings, sales performance |
+| `sales` | growth execution | clients, meeting logs, bookings, own performance |
+| `finance` | collection & billing | PO, invoice, payment, voucher, finance dashboard |
+| `operation` | readiness & service | fleet, drivers, maintenance |
+| `head-pool` | dispatch control | pool queue, assignment, vehicle readiness |
+| `pool-staff` | dispatch execution | queue operasional dan assignment terbatas |
 
-## 👤 Demo Accounts
+## ✨ UX Premium Highlights
 
-Semua akun demo menggunakan password: `password`
+- 🎛️ **Dashboard hero command center** per role
+- 🧭 **Sidebar modern** dengan active state tegas
+- 📱 **Mobile overlay sidebar**
+- ⌘ **Cmd+K style command palette**
+- 🎭 **Demo role switcher** khusus demo env
+- ♻️ **Reset demo seed button** khusus demo env dan super-admin
+- 📊 **Compact KPI system** dengan drill-down
+- 📈 **Revenue trend visual** yang benar-benar hidup
+- 🤝 **Partner / Vendor module**
+- 🕘 **Activity timeline** lebih visual
+- 🛠️ **Maintenance detail** lebih readable
+- 🧾 **PO approval timeline**
+- 🚚 **Dispatch audit trail** visual
+- 🖨️ **Print-friendly detail pages**
 
-- `superadmin@blueerp.test`
-- `gm@blueerp.test`
-- `salesmanager@blueerp.test`
-- `sales@blueerp.test`
-- `finance@blueerp.test`
-- `operation@blueerp.test`
-- `headpool@blueerp.test`
-- `poolstaff@blueerp.test`
+## 🧪 Demo Accounts
 
-## 📂 File Penting
+Semua akun demo default memakai password: `password`
 
-- [PROJECT_MASTERPLAN.md](./PROJECT_MASTERPLAN.md) — arah besar project
-- [PROJECT_PRD.md](./PROJECT_PRD.md) — requirement produk
-- [AGENTS.md](./AGENTS.md) — instruksi agent workspace
-- [CHECKPOINT_CURRENT.md](./CHECKPOINT_CURRENT.md) — checkpoint aktif terbaru
-- [docs/CODEX_MASTER_PROMPT.md](./docs/CODEX_MASTER_PROMPT.md) — prompt kerja Codex
-- [docs/DEMO_SCRIPT_PAK_KOBI.md](./docs/DEMO_SCRIPT_PAK_KOBI.md) — script demo stakeholder
-- [docs/QA_CHECKLIST.md](./docs/QA_CHECKLIST.md) — checklist QA internal
+| Role | Email |
+|---|---|
+| Super Admin | `superadmin@blueerp.test` |
+| GM | `gm@blueerp.test` |
+| Sales Manager | `salesmanager@blueerp.test` |
+| Sales | `sales@blueerp.test` |
+| Finance | `finance@blueerp.test` |
+| Operation | `operation@blueerp.test` |
+| Head Pool | `headpool@blueerp.test` |
+| Pool Staff | `poolstaff@blueerp.test` |
+
+## 🚀 Demo Flow Utama
+
+1. 👔 GM buka **Dashboard** untuk lihat KPI dan command center.
+2. 🤝 Sales buka **CRM** lalu buat / follow-up client.
+3. 📋 Sales buat **Booking**.
+4. 🧭 Pool assign **Driver + Vehicle**.
+5. ✅ Booking di-confirm.
+6. 💳 Finance buat **PO** dari booking confirmed.
+7. 🧾 Finance generate **Invoice** dari PO approved.
+8. 💰 Finance record **Payment** partial / full.
+9. 🎟️ Jika perlu, payment bisa pakai **E-Voucher**.
+10. 🛠️ Operation pantau **Maintenance** dan state kendaraan.
+11. 🛡️ Super Admin bisa buka **HR Backend-only**.
 
 ## 🌱 Scalable Demo Seeder
 
-Environment variables yang didukung:
+Environment flags yang didukung:
 
 - `ENABLE_DEMO_SEED=true/false`
 - `DEMO_SEED_MODE=demo|stress`
-- `DEMO_CUSTOMER_COUNT=50` untuk demo mode, atau `1200` default efektif untuk stress mode bila tidak diisi
+- `DEMO_CUSTOMER_COUNT=50`
 
-Mode yang tersedia:
+Mode:
 
-- `demo`: curated dataset untuk flow presentasi, dengan sekitar 10-50 client dan data operasional yang tetap realistis.
-- `stress`: dataset besar untuk uji pagination, search, dan performa awal. Default menghasilkan minimal 1200 client, 150-250 contact, 100-200 meeting log, 50-100 booking, dan 30-60 invoice.
+| Mode | Tujuan | Karakteristik |
+|---|---|---|
+| `demo` | stakeholder walkthrough | curated flow, data realistis, cepat untuk presentasi |
+| `stress` | early performance test | 1000+ client, search/pagination/load lebih berat |
 
-Rekomendasi penggunaan:
+Rekomendasi:
 
-- Demo stakeholder: `DEMO_SEED_MODE=demo` ✅
-- Uji performa awal: `DEMO_SEED_MODE=stress` ⚡
+- 🎬 Demo stakeholder: `DEMO_SEED_MODE=demo`
+- ⚙️ Load / pagination validation: `DEMO_SEED_MODE=stress`
 
-## 🧪 Status Saat Ini
+## ✅ Validation Status Terbaru
 
-- Railway deploy aktif dan smoke test inti sebelumnya sudah berhasil
-- Railway live refresh terbaru sudah diverifikasi ulang di domain aktif `gbdemo01.up.railway.app`
-- CRUD + business flow utama sudah mencakup:
-  - Auth + RBAC
-  - CRM
-  - Fleet
-  - Drivers
-  - Booking + Pool Dispatch
-  - Finance Flow
-  - Maintenance
-  - HR backend-only
-- Upgrade navigasi, detail-page enrichment, global search, dan recent activity sudah selesai untuk phase 6
-- Extended search filters dan activity drill-down sudah selesai untuk phase 7.1
-- Full validation terbaru dari clone stabil: `90 tests passed`
-- Full build summary tersedia di:
-  - [docs/FULL_BUILD_SUMMARY.md](./docs/FULL_BUILD_SUMMARY.md)
-- Changelog checkpoint:
-  - [CHANGELOG.md](./CHANGELOG.md)
-- Final review pack:
-  - [docs/FINAL_DEMO_REVIEW_PACK.md](./docs/FINAL_DEMO_REVIEW_PACK.md)
+Validation terakhir dari clone sehat:
 
-## ⚠️ Prinsip Penting
+| Command | Result |
+|---|---|
+| `composer install --no-interaction --prefer-dist` | ✅ |
+| `npm install` | ✅ |
+| `php artisan optimize:clear` | ✅ |
+| `php artisan migrate:fresh --seed` | ✅ |
+| `npm run build` | ✅ |
+| `php artisan test` | ✅ |
 
-- Jangan pindah stack dulu.
-- Jangan expose HR ke non-super-admin.
-- Jangan commit secrets.
-- Jangan refactor besar tanpa alasan bug yang jelas.
-- Fokus selalu ke flow demo yang bisa dipresentasikan dengan nyaman.
+**Final result:** `96 passed` / `253 assertions` 🎉
 
-## ❤️ Built By CODEX
+## 🚂 Railway Deploy
 
-Project ini dibangun, dirapikan, dan didorong checkpoint demi checkpoint oleh **CODEX** sebagai coding partner implementasi.  
-Targetnya bukan cuma kode jalan, tapi juga repo yang rapi, demo yang siap dipresentasikan, dan flow bisnis yang gampang di-follow. 🤝
+### Quick Flow
 
-## Railway Deploy 🚂
+1. Deploy dari GitHub repo ini
+2. Tambah MySQL service
+3. Isi env dari `.env.railway.example`
+4. Generate `APP_KEY`
+5. Set `APP_URL`
+6. Jalankan startup via `railway/init-app.sh`
+7. Aktifkan demo flags bila perlu
 
-### Quick Deploy Flow
-
-1. Deploy from GitHub repo: [adith92/GBCRMbyCODEX](https://github.com/adith92/GBCRMbyCODEX)
-2. Add a MySQL database service in Railway
-3. Fill required environment variables from `.env.railway.example`
-4. Generate app key locally:
-
-```bash
-php artisan key:generate --show
-```
-
-5. Set build command:
-
-```bash
-composer install --no-interaction --prefer-dist --optimize-autoloader
-npm install
-npm run build
-```
-
-6. Set pre-deploy command:
-
-```bash
-sh railway/init-app.sh
-```
-
-7. Generate a public Railway domain
-8. Set `APP_URL` to that Railway domain
-9. If you want seeded data, set the seed flags:
+### Demo flags untuk Railway
 
 ```bash
 ENABLE_DEMO_SEED=true
@@ -200,31 +209,17 @@ DEMO_SEED_MODE=demo
 DEMO_CUSTOMER_COUNT=50
 ```
 
-Use `DEMO_SEED_MODE=demo` for normal stakeholder walkthroughs.
-Use `DEMO_SEED_MODE=stress` for heavier pagination/search validation.
-When stress mode is enabled and `DEMO_CUSTOMER_COUNT` is empty, the seeder defaults to 1200 clients.
+### Docs
 
-### Smoke Test Checklist
+- [docs/RAILWAY_DEPLOYMENT.md](./docs/RAILWAY_DEPLOYMENT.md)
 
-- Login page opens ✅
-- Dashboard opens ✅
-- Bookings page opens ✅
-- Finance page opens ✅
-- Maintenance page opens ✅
-- No obvious 500 error in logs ✅
-- Logout works ✅
+## 🔁 GitHub CI
 
-### Deployment Docs
-
-- Detailed guide: [docs/RAILWAY_DEPLOYMENT.md](./docs/RAILWAY_DEPLOYMENT.md)
-
-## GitHub CI/CD 🔁
-
-Repo ini sekarang sudah disiapkan untuk GitHub Actions CI dasar melalui:
+Workflow CI tersedia di:
 
 - `.github/workflows/ci.yml`
 
-Workflow tersebut menjalankan:
+Yang dijalankan:
 
 - `composer install`
 - `npm install`
@@ -233,22 +228,23 @@ Workflow tersebut menjalankan:
 - `npm run build`
 - `php artisan test`
 
-Catatan penting:
+## 📚 Dokumen Penting
 
-- test workflow memakai `sqlite` untuk environment CI
-- `package.json` sekarang punya field `name=gbcrmbycodex` supaya `package-lock.json` tidak berubah hanya karena nama folder clone lokal berbeda
-- ini menghilangkan drift lockfile lokal seperti yang sebelumnya muncul saat repo di-clone ke folder bernama berbeda
-
-## 🧾 Build Summary
-
-Kalau kamu ingin lihat hasil pembangunan project dari awal sampai state sekarang, buka:
-
+- [PROJECT_MASTERPLAN.md](./PROJECT_MASTERPLAN.md)
+- [PROJECT_PRD.md](./PROJECT_PRD.md)
+- [CHECKPOINT_CURRENT.md](./CHECKPOINT_CURRENT.md)
+- [CHANGELOG.md](./CHANGELOG.md)
 - [docs/FULL_BUILD_SUMMARY.md](./docs/FULL_BUILD_SUMMARY.md)
+- [docs/FINAL_DEMO_REVIEW_PACK.md](./docs/FINAL_DEMO_REVIEW_PACK.md)
+- [docs/DEMO_SCRIPT_PAK_KOBI.md](./docs/DEMO_SCRIPT_PAK_KOBI.md)
+- [docs/QA_CHECKLIST.md](./docs/QA_CHECKLIST.md)
 
-Dokumen ini merangkum:
+## ❤️ Built by CODEX
 
-- checkpoint per fase
-- fitur yang sudah selesai
-- runtime/deployment fixes
-- status validasi
-- progress UI/UX terbaru
+Project ini dibangun dan di-upgrade secara bertahap oleh **CODEX** sebagai coding partner implementasi.  
+Fokusnya bukan cuma “fitur jalan”, tapi juga:
+
+- backend yang tetap kuat 🔐
+- flow demo yang mudah dipresentasikan 🎬
+- UX yang modern dan lebih hidup ✨
+- repo yang rapi untuk scale-up berikutnya 🚀

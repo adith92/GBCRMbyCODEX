@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Driver;
 use App\Models\Invoice;
 use App\Models\MaintenanceLog;
+use App\Models\VendorPartner;
 use App\Models\Vehicle;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ class SearchController extends Controller
                 'client' => fn () => $this->searchClients($user, $query),
                 'vehicle' => fn () => $this->searchVehicles($user, $query),
                 'driver' => fn () => $this->searchDrivers($user, $query),
+                'partner' => fn () => $this->searchPartners($user, $query),
                 'booking' => fn () => $this->searchBookings($user, $query),
                 'invoice' => fn () => $this->searchInvoices($user, $query),
                 'maintenance' => fn () => $this->searchMaintenance($user, $query),
@@ -67,6 +69,7 @@ class SearchController extends Controller
             'client' => 'Clients',
             'vehicle' => 'Vehicles',
             'driver' => 'Drivers',
+            'partner' => 'Partners',
             'booking' => 'Bookings',
             'invoice' => 'Invoices',
             'maintenance' => 'Maintenance',
@@ -78,6 +81,7 @@ class SearchController extends Controller
         return $user->can('clients.view')
             || $user->can('vehicles.view')
             || $user->can('drivers.view')
+            || $user->can('clients.view')
             || $user->can('bookings.view')
             || $user->can('invoices.view')
             || $user->can('maintenance.view')
@@ -168,6 +172,29 @@ class SearchController extends Controller
                 'label' => $booking->booking_number,
                 'meta' => $booking->client?->name ?? strtoupper($booking->status),
                 'url' => route('bookings.show', $booking),
+            ]);
+    }
+
+    private function searchPartners($user, string $query): Collection
+    {
+        if (! $user->can('clients.view')) {
+            return collect();
+        }
+
+        return VendorPartner::query()
+            ->where(function ($builder) use ($query): void {
+                $builder->where('name', 'like', "%{$query}%")
+                    ->orWhere('code', 'like', "%{$query}%")
+                    ->orWhere('service_type', 'like', "%{$query}%")
+                    ->orWhere('contact_person', 'like', "%{$query}%");
+            })
+            ->limit(5)
+            ->get()
+            ->map(fn (VendorPartner $partner) => [
+                'type' => 'Partner',
+                'label' => $partner->name,
+                'meta' => $partner->service_type ?: strtoupper($partner->status),
+                'url' => route('partners.vendors.show', $partner),
             ]);
     }
 

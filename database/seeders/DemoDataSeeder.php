@@ -16,6 +16,7 @@ use App\Models\Payment;
 use App\Models\Pool;
 use App\Models\PurchaseOrder;
 use App\Models\User;
+use App\Models\VendorPartner;
 use App\Models\Vehicle;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
@@ -52,6 +53,7 @@ class DemoDataSeeder extends Seeder
         $clients = Client::factory()->count($clientCount)->create();
 
         $featuredClients = $clients->take(min(10, $clients->count()));
+        $this->seedVendorPartners();
         $featuredClients->each(function (Client $client) use ($salesUser): void {
             ClientContact::factory()->count(2)->create(['client_id' => $client->id]);
             MeetingLog::factory()->count(1)->create([
@@ -177,6 +179,30 @@ class DemoDataSeeder extends Seeder
         $invoices = $this->seedInvoices($purchaseOrders, 8);
         $vouchers = $this->seedEVouchers($clients);
         $this->seedPayments($invoices, $vouchers, $financeUser?->id, 8);
+    }
+
+    protected function seedVendorPartners(): void
+    {
+        collect([
+            ['name' => 'Bluebird Workshop Central', 'category' => 'vendor', 'service_type' => 'Workshop', 'city' => 'Jakarta', 'status' => 'active'],
+            ['name' => 'Skyline Rental Support', 'category' => 'partner', 'service_type' => 'Rental Backup Unit', 'city' => 'Bekasi', 'status' => 'active'],
+            ['name' => 'PT Sinar Ban Nusantara', 'category' => 'supplier', 'service_type' => 'Tyre Supplier', 'city' => 'Tangerang', 'status' => 'active'],
+            ['name' => 'Mitra Driver Outsource', 'category' => 'partner', 'service_type' => 'Driver Outsource', 'city' => 'Depok', 'status' => 'onboarding'],
+            ['name' => 'Auto Parts Prime', 'category' => 'supplier', 'service_type' => 'Sparepart Supplier', 'city' => 'Jakarta', 'status' => 'active'],
+        ])->each(function (array $row, int $index): void {
+            VendorPartner::query()->create([
+                'code' => 'VP-'.now()->format('Ym').'-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
+                'name' => $row['name'],
+                'category' => $row['category'],
+                'service_type' => $row['service_type'],
+                'contact_person' => 'PIC '.($index + 1),
+                'phone' => '+62-811-77'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
+                'email' => 'partner'.($index + 1).'@blueerp.test',
+                'city' => $row['city'],
+                'status' => $row['status'],
+                'notes' => 'Seeded partner/vendor for procurement, maintenance, and backup dispatch scenarios.',
+            ]);
+        });
     }
 
     protected function seedStressData(Collection $users): void

@@ -4,7 +4,7 @@
         ['label' => 'Activity', 'url' => route('activity.index')],
     ]" />
 
-    <x-ui.page-header title="Recent activity" eyebrow="Workspace Activity" description="A lightweight operational timeline spanning bookings, invoices, payments, maintenance, and CRM follow-up." />
+    <x-ui.page-header title="Recent activity 🕘" eyebrow="Workspace Activity" description="Visual operational timeline spanning bookings, invoices, payments, maintenance, and CRM follow-up." />
 
     @if ($summary->isNotEmpty())
         <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
@@ -36,7 +36,16 @@
                     <a href="{{ $item['url'] }}" class="block rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50/50">
                         <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{{ $item['type'] }}</p>
+                                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                                    @switch($item['type'])
+                                        @case('Booking') 📋 @break
+                                        @case('Invoice') 🧾 @break
+                                        @case('Payment') 💰 @break
+                                        @case('Maintenance') 🛠️ @break
+                                        @default 🤝
+                                    @endswitch
+                                    {{ $item['type'] }}
+                                </p>
                                 <p class="mt-1 font-semibold text-slate-900">{{ $item['title'] }}</p>
                                 <p class="mt-1 text-sm text-slate-500">{{ $item['description'] }}</p>
                             </div>

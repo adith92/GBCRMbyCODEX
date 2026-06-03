@@ -4,11 +4,11 @@
         ['label' => 'Search', 'url' => route('search.index')],
     ]" />
 
-    <x-ui.page-header title="Global search" eyebrow="Discovery" description="Jump quickly across CRM, fleet, drivers, bookings, finance, and maintenance from one search surface." />
+    <x-ui.page-header title="Global search 🔎" eyebrow="Discovery" description="Jump quickly across CRM, partner/vendor, fleet, drivers, bookings, finance, and maintenance from one search surface." />
 
-    <x-ui.form-card title="Search workspace" description="Search across entities you are allowed to access.">
+    <x-ui.form-card title="Search workspace" description="Search across entities you are allowed to access. Tip: bisa juga dibuka cepat dari command palette ⌘K.">
         <form method="GET" class="flex flex-col gap-3 md:flex-row">
-            <input type="text" name="q" value="{{ $query }}" placeholder="Try booking number, client name, plate number, driver, or invoice" class="ui-input md:flex-1">
+            <input type="text" name="q" value="{{ $query }}" placeholder="Try booking, client, partner, plate, driver, or invoice" class="ui-input md:flex-1">
             <select name="scope" class="ui-select md:w-56">
                 @foreach ($scopeOptions as $key => $label)
                     <option value="{{ $key }}" @selected($scope === $key)>{{ $label }}</option>

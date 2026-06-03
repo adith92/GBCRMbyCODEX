@@ -2,108 +2,92 @@
 
 ## Current Checkpoint
 
-**Checkpoint ID:** PHASE-7.3-FINAL-DEMO-REVIEW-PACK-COMPLETE  
+**Checkpoint ID:** PHASE-8.0-PRODUCTION-GRADE-PREMIUM-UX-COMPLETE  
 **Date:** 2026-06-03  
 **Status:** Complete  
 **Branch:** main
 
 ## Completed Work
 
-### Checkpoint 6.1 — Linked Dashboard + Breadcrumb Upgrade
+### UX Premium Upgrade
 
-- Upgraded KPI cards on the main dashboard so they act as drill-down entry points.
-- Enhanced shared `stat-card` component to support clickable cards.
-- Refined the shared breadcrumb component for clearer desktop/mobile navigation.
-- Added breadcrumb coverage to key bookings, pool, and finance pages.
-- Improved drill-down continuity by linking client names and finance references more consistently.
-- Modernized older detail pages to match the current enterprise UI language.
+- Mengubah shell utama menjadi **command center premium** dengan:
+  - sidebar modern
+  - mobile overlay sidebar
+  - active state lebih tegas
+  - topbar yang lebih padat dan fokus
+  - command palette gaya `Cmd+K`
+- Menambahkan density system baru di CSS untuk dashboard/card/layout yang lebih compact.
+- Menambahkan print-friendly behavior untuk detail pages agar lebih mudah diekspor / print review.
 
-### Checkpoint 6.2 — Detail Page Enrichment
+### Dashboard & Role Experience
 
-- Refined CRM client index/create/edit/show pages with current UI component patterns.
-- Refined fleet vehicle index/create/edit/show pages with stronger page headers, forms, and table-card structure.
-- Refined driver create/edit/show pages for better operational readability.
-- Enriched booking create/edit/show pages with consistent breadcrumb + form-card patterns.
-- Enriched invoice detail with summary KPI cards.
-- Added summary stat sections on major detail pages:
-  - client
-  - vehicle
-  - driver
-  - booking
-  - invoice
-- Updated project docs:
-  - README status refresh
-  - full build summary from foundation to current phase
+- Dashboard utama dirombak menjadi **hero command center** dengan persona per role:
+  - super-admin
+  - gm
+  - sales-manager
+  - sales
+  - finance
+  - operation
+  - head-pool
+  - pool-staff
+- Menambahkan KPI compact dengan drill-down tetap aktif.
+- Menambahkan revenue chart visual yang lebih hidup.
+- Menambahkan command cards untuk quick jump ke:
+  - search
+  - activity
+  - reports
+- Menambahkan role focus panel agar dashboard terasa relevan untuk tiap user demo.
 
-### Checkpoint 6.3 — Global Search + Activity Visibility
+### Sales / Reporting / Partner Expansion
 
-- Added permission-aware global search across clients, vehicles, drivers, bookings, invoices, and maintenance.
-- Added a lightweight recent activity timeline spanning bookings, invoices, payments, maintenance, and CRM follow-up.
-- Wired protected search and activity routes into the authenticated workspace.
-- Added sidebar and topbar navigation access for search/activity based on user permission scope.
-- Added feature tests covering role-aware search visibility and activity rendering.
+- Menjaga Sales Performance yang sudah ada dan memperkaya positioning-nya di sidebar dan dashboard.
+- Mengganti reports placeholder menjadi **Reports Dashboard** yang nyata.
+- Menambahkan modul **Partners & Vendors** untuk supplier/workshop/partner operasional.
+- Menambahkan search scope untuk partner/vendor.
 
-### Checkpoint 6.4 — Final Navigation Hardening
+### Demo Environment Tools
 
-- Added dashboard quick-access cards for Workspace Search and Recent Activity.
-- Completed a lightweight demo-navigation polish pass without changing core business logic.
-- Finished validation from the stable clone workspace with clean artisan/test completion.
+- Menambahkan **demo role switcher** khusus saat demo seeding aktif.
+- Menambahkan **reset demo seed button** untuk super-admin di demo environment.
+- Menjaga proteksi agar fitur ini tidak menjadi flow umum untuk environment non-demo.
 
-### Checkpoint 7.1 — Extended Search Filters + Activity Drill-down
+### Visual Drill-down Enrichment
 
-- Added module scope filters to global search so demo users can narrow results to a single entity type.
-- Added activity type filters and summary cards for faster drill-down into bookings, invoices, payments, maintenance, and meetings.
-- Extended TDD coverage for scoped search and filtered activity timeline behavior.
-
-### Checkpoint 7.2 — Railway Refresh + Smoke Revalidation
-
-- Linked the stable clone workspace to the live Railway project again.
-- Updated Railway production `APP_URL` to the active public domain `https://gbdemo01.up.railway.app`.
-- Revalidated live smoke routes using demo credentials:
-  - `/login`
-  - `/dashboard`
-  - `/crm/clients`
-  - `/fleet/vehicles`
-  - `/drivers`
-  - `/bookings`
-  - `/pool/queue`
-  - `/finance`
-  - `/maintenance`
-  - `/admin/hr/drivers`
-- Verified finance user still receives `403` for the HR route.
-
-### Checkpoint 7.3 — Final Demo Review Pack
-
-- Added a final handoff/review document consolidating live URL, demo accounts, validation, smoke-test result, and recommended review flow.
-- Synchronized README, changelog, and summary documentation to the final phase 7 state.
-- Closed the practical MVP demo roadmap for the current version.
-- Added GitHub CI readiness work:
-  - stable `package.json` package name to prevent local `package-lock.json` drift
-  - GitHub Actions workflow for install, build, migrate, seed, and full test execution
+- Menambahkan **PO approval timeline** visual.
+- Menambahkan **dispatch audit trail** visual di booking detail.
+- Menambahkan **maintenance service timeline** visual.
+- Mempertahankan semua route, flow database, dan RBAC lama tetap utuh.
 
 ## Validation Result
 
-- Validation completed successfully from the stable clone workspace:
-  - `php artisan optimize:clear`
-  - `php artisan migrate:fresh --seed`
-  - `npm run build`
-  - `php artisan test`
-- Current full test result: `90 passed`
-- Original local repository git index instability remains a historical note only; active implementation/validation continued safely from the clean clone workspace.
-- Additional targeted validation for checkpoint 7.1:
-  - `php artisan test tests/Feature/GlobalSearchActivityTest.php`
-  - Result: `6 passed`
-- Live Railway smoke revalidation for checkpoint 7.2:
-  - Super-admin login redirect to `/dashboard`: success
-  - Main demo routes: all returned `200`
-  - Finance access to `/admin/hr/drivers`: returned `403`
-- Final review pack generated for stakeholder/internal handoff.
+Validation final di clone sehat berhasil:
 
-## Known TODO
+- `composer install --no-interaction --prefer-dist` ✅
+- `npm install` ✅
+- `php artisan optimize:clear` ✅
+- `php artisan migrate:fresh --seed` ✅
+- `npm run build` ✅
+- `php artisan test` ✅
 
-- Optional: attach screenshots or a formal presentation deck if stakeholder material needs to be more visual.
-- Optional: continue to a production-hardening roadmap outside the current MVP/demo scope.
+Hasil akhir:
+
+- `96 passed`
+- `253 assertions`
+
+## Known Issue
+
+- `composer install` masih menampilkan warning bahwa `composer.lock` historis belum sepenuhnya sinkron dengan `composer.json`, tetapi install tetap sukses dan seluruh suite validasi tetap hijau.
+- Status Railway belum direfresh lagi di checkpoint ini; pengecekan live dapat dilakukan setelah push final bila diperlukan.
 
 ## Next Recommended Checkpoint
 
-Current practical roadmap is complete. Next optional phase can be **Phase 8 — Production Hardening**.
+Phase praktis saat ini sudah sangat matang. Next optional phase:
+
+**Phase 8.1 — Live Railway Refresh + Visual QA Pass**
+
+Fokusnya:
+
+- redeploy ke Railway
+- smoke test live
+- QA visual mobile/final polish

@@ -47,6 +47,13 @@
         animation: ui-fade-in 0.35s ease-out;
     }
 
+    .ui-command-hero {
+        background:
+            radial-gradient(circle at top right, rgba(55, 138, 221, 0.16), transparent 35%),
+            linear-gradient(135deg, #032646 0%, #0a467f 52%, #378add 100%);
+        color: white;
+    }
+
     .ui-card {
         @apply border bg-white;
         border-color: var(--gb-border);
@@ -225,6 +232,38 @@
         box-shadow: 0 8px 24px rgba(4, 44, 83, 0.05);
     }
 
+    .ui-timeline {
+        position: relative;
+    }
+
+    .ui-timeline::before {
+        content: '';
+        position: absolute;
+        left: 11px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, rgba(24, 95, 165, 0.22), rgba(55, 138, 221, 0.12));
+    }
+
+    .ui-timeline-item {
+        position: relative;
+        padding-left: 2.5rem;
+    }
+
+    .ui-timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 0.18rem;
+        top: 0.9rem;
+        width: 0.95rem;
+        height: 0.95rem;
+        border-radius: 999px;
+        background: white;
+        border: 3px solid #185fa5;
+        box-shadow: 0 0 0 4px rgba(24, 95, 165, 0.08);
+    }
+
     .ui-kpi-caption {
         @apply mt-1 text-[11px] leading-5 text-slate-500;
     }
@@ -256,6 +295,32 @@
 
     .bg-bb-navy {
         background-color: var(--gb-navy);
+    }
+}
+
+@media print {
+    body {
+        background: white !important;
+    }
+
+    aside,
+    header,
+    .no-print {
+        display: none !important;
+    }
+
+    .app-content,
+    main,
+    .ui-card,
+    .ui-card-muted,
+    .ui-dashboard-card {
+        background: white !important;
+        box-shadow: none !important;
+        border-color: #d1d5db !important;
+    }
+
+    .ui-table tbody tr:hover {
+        background: transparent !important;
     }
 }
 
