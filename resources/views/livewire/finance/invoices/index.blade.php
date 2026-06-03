@@ -19,7 +19,12 @@
         @if($invoices->count()===0)
             <div class="p-5"><x-ui.empty-state title="No invoices found" description="Invoices will appear here after approved purchase orders are converted." /></div>
         @else
-            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>Invoice</th><th>Client</th><th>Status</th><th>Total</th><th class="text-right">Action</th></tr></thead><tbody>@foreach($invoices as $invoice)<tr><td><p class="font-semibold text-slate-900">{{ $invoice->invoice_number }}</p></td><td>@if($invoice->client)<a class="ui-link" href="{{ route('crm.clients.show', $invoice->client) }}">{{ $invoice->client->name }}</a>@else - @endif</td><td><x-ui.status-badge :status="$invoice->status" /></td><td>{{ number_format($invoice->total,2) }}</td><td class="text-right"><a class="ui-link" href="{{ route('finance.invoices.show',$invoice) }}">Open Detail</a></td></tr>@endforeach</tbody></table></div>
+            <div class="ui-table-wrap"><table class="ui-table"><thead><tr>
+                <th><button type="button" wire:click="sort('invoice_number')" class="ui-sort-link {{ $sortBy === 'invoice_number' ? 'is-active' : '' }}">Invoice @if($sortBy==='invoice_number')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('client_name')" class="ui-sort-link {{ $sortBy === 'client_name' ? 'is-active' : '' }}">Client @if($sortBy==='client_name')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('status')" class="ui-sort-link {{ $sortBy === 'status' ? 'is-active' : '' }}">Status @if($sortBy==='status')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('total')" class="ui-sort-link {{ $sortBy === 'total' ? 'is-active' : '' }}">Total @if($sortBy==='total')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+            </tr></thead><tbody>@foreach($invoices as $invoice)<tr><td><a class="ui-link font-semibold text-slate-900" href="{{ route('finance.invoices.show',$invoice) }}">{{ $invoice->invoice_number }}</a></td><td>@if($invoice->client)<a class="ui-link" href="{{ route('crm.clients.show', $invoice->client) }}">{{ $invoice->client->name }}</a>@else - @endif</td><td><a href="{{ route('finance.invoices.index', ['status' => $invoice->status]) }}"><x-ui.status-badge :status="$invoice->status" /></a></td><td>{{ number_format($invoice->total,2) }}</td></tr>@endforeach</tbody></table></div>
             <div class="border-t border-slate-200/80 px-4 py-4">{{ $invoices->links() }}</div>
         @endif
     </x-ui.table-card>

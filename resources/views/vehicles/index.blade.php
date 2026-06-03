@@ -1,4 +1,15 @@
 <x-layouts.app :title="'Vehicles'" :header="'Fleet / Vehicles'">
+    @php
+        $nextDir = function (string $field) use ($filters): string {
+            return (($filters['sort_by'] ?? 'plate_number') === $field && ($filters['sort_dir'] ?? 'asc') === 'asc') ? 'desc' : 'asc';
+        };
+        $sortIndicator = function (string $field) use ($filters): string {
+            if (($filters['sort_by'] ?? 'plate_number') !== $field) {
+                return '';
+            }
+            return ($filters['sort_dir'] ?? 'asc') === 'asc' ? '↑' : '↓';
+        };
+    @endphp
     <x-breadcrumbs :items="[
         ['label' => 'Dashboard', 'url' => route('dashboard')],
         ['label' => 'Fleet', 'url' => route('fleet.index')],
@@ -26,15 +37,19 @@
         @else
             <div class="ui-table-wrap">
                 <table class="ui-table">
-                    <thead><tr><th>Plate</th><th>Pool</th><th>Vehicle</th><th>Status</th><th class="text-right">Action</th></tr></thead>
+                    <thead><tr>
+                        <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? 'plate_number') === 'plate_number' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'plate_number', 'sort_dir' => $nextDir('plate_number')]) }}">Plate {{ $sortIndicator('plate_number') }}</a></th>
+                        <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? '') === 'pool_name' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'pool_name', 'sort_dir' => $nextDir('pool_name')]) }}">Pool {{ $sortIndicator('pool_name') }}</a></th>
+                        <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? '') === 'brand' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'brand', 'sort_dir' => $nextDir('brand')]) }}">Vehicle {{ $sortIndicator('brand') }}</a></th>
+                        <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? '') === 'status' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'status', 'sort_dir' => $nextDir('status')]) }}">Status {{ $sortIndicator('status') }}</a></th>
+                    </tr></thead>
                     <tbody>
                     @foreach($vehicles as $vehicle)
                         <tr>
-                            <td class="font-semibold text-slate-900">{{ $vehicle->plate_number }}</td>
-                            <td>{{ $vehicle->pool?->name ?? '-' }}</td>
-                            <td>{{ $vehicle->brand }} {{ $vehicle->model }}</td>
-                            <td><x-ui.status-badge :status="$vehicle->status" /></td>
-                            <td class="text-right"><a class="ui-link" href="{{ route('fleet.vehicles.show', $vehicle) }}">Open Detail</a></td>
+                            <td class="font-semibold text-slate-900"><a class="ui-link font-semibold text-slate-900" href="{{ route('fleet.vehicles.show', $vehicle) }}">{{ $vehicle->plate_number }}</a></td>
+                            <td>@if($vehicle->pool)<a class="ui-link" href="{{ request()->fullUrlWithQuery(['pool_id' => $vehicle->pool->id]) }}">{{ $vehicle->pool->name }}</a>@else - @endif</td>
+                            <td><a class="ui-link" href="{{ route('fleet.vehicles.show', $vehicle) }}">{{ $vehicle->brand }} {{ $vehicle->model }}</a></td>
+                            <td><a href="{{ request()->fullUrlWithQuery(['status' => $vehicle->status]) }}"><x-ui.status-badge :status="$vehicle->status" /></a></td>
                         </tr>
                     @endforeach
                     </tbody>

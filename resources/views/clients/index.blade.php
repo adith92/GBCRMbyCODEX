@@ -1,4 +1,15 @@
 <x-layouts.app :title="'Clients'" :header="'CRM / Clients'">
+    @php
+        $nextDir = function (string $field) use ($filters): string {
+            return (($filters['sort_by'] ?? 'name') === $field && ($filters['sort_dir'] ?? 'asc') === 'asc') ? 'desc' : 'asc';
+        };
+        $sortIndicator = function (string $field) use ($filters): string {
+            if (($filters['sort_by'] ?? 'name') !== $field) {
+                return '';
+            }
+            return ($filters['sort_dir'] ?? 'asc') === 'asc' ? '↑' : '↓';
+        };
+    @endphp
     <x-breadcrumbs :items="[
         ['label' => 'Dashboard', 'url' => route('dashboard')],
         ['label' => 'CRM', 'url' => route('crm.index')],
@@ -27,9 +38,14 @@
         @if($clients->count()===0)
             <div class="p-5"><x-ui.empty-state title="No clients found" description="Try broadening the filters or create a new account to start the CRM flow." /></div>
         @else
-            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>Name</th><th>Tier</th><th>Status</th><th>Contacts</th><th class="text-right">Action</th></tr></thead><tbody>
+            <div class="ui-table-wrap"><table class="ui-table"><thead><tr>
+                <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? 'name') === 'name' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'name', 'sort_dir' => $nextDir('name')]) }}">Name {{ $sortIndicator('name') }}</a></th>
+                <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? '') === 'tier' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'tier', 'sort_dir' => $nextDir('tier')]) }}">Tier {{ $sortIndicator('tier') }}</a></th>
+                <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? '') === 'status' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'status', 'sort_dir' => $nextDir('status')]) }}">Status {{ $sortIndicator('status') }}</a></th>
+                <th><a class="ui-sort-link {{ ($filters['sort_by'] ?? '') === 'contacts_count' ? 'is-active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort_by' => 'contacts_count', 'sort_dir' => $nextDir('contacts_count')]) }}">Contacts {{ $sortIndicator('contacts_count') }}</a></th>
+            </tr></thead><tbody>
                 @foreach($clients as $client)
-                    <tr><td><p class="font-semibold text-slate-900">{{ $client->name }}</p><p class="mt-1 text-xs text-slate-500">{{ $client->legal_name ?: '-' }}</p></td><td><x-ui.status-badge :status="$client->tier" /></td><td><x-ui.status-badge :status="$client->status" /></td><td>{{ $client->contacts_count }}</td><td class="text-right"><a class="ui-link" href="{{ route('crm.clients.show', $client) }}">Open Detail</a></td></tr>
+                    <tr><td><a class="ui-link font-semibold text-slate-900" href="{{ route('crm.clients.show', $client) }}">{{ $client->name }}</a><p class="mt-1 text-xs text-slate-500">{{ $client->legal_name ?: '-' }}</p></td><td><a href="{{ request()->fullUrlWithQuery(['tier' => $client->tier]) }}"><x-ui.status-badge :status="$client->tier" /></a></td><td><a href="{{ request()->fullUrlWithQuery(['status' => $client->status]) }}"><x-ui.status-badge :status="$client->status" /></a></td><td>{{ $client->contacts_count }}</td></tr>
                 @endforeach
             </tbody></table></div>
             <div class="border-t border-slate-200/80 px-4 py-4">{{ $clients->links() }}</div>

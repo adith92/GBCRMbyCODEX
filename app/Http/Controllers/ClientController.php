@@ -15,6 +15,14 @@ class ClientController extends Controller
     {
         abort_unless($request->user()->can('clients.view'), 403);
 
+        $sortBy = $request->string('sort_by')->toString() ?: 'name';
+        $sortDir = $request->string('sort_dir')->toString() === 'desc' ? 'desc' : 'asc';
+        $allowedSorts = ['name', 'legal_name', 'tier', 'status', 'contacts_count'];
+
+        if (! in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'name';
+        }
+
         $clients = Client::query()
             ->withCount('contacts')
             ->when($request->string('tier')->toString(), fn ($query, $tier) => $query->where('tier', $tier))
@@ -25,13 +33,13 @@ class ClientController extends Controller
                         ->orWhere('legal_name', 'like', "%{$search}%");
                 });
             })
-            ->latest()
+            ->orderBy($sortBy, $sortDir)
             ->paginate(10)
             ->withQueryString();
 
         return view('clients.index', [
             'clients' => $clients,
-            'filters' => $request->only(['tier', 'status', 'search']),
+            'filters' => $request->only(['tier', 'status', 'search', 'sort_by', 'sort_dir']),
         ]);
     }
 
