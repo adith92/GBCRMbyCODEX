@@ -6,15 +6,15 @@
             <p class="ui-section-title">{{ $eyebrow }}</p>
         @endif
         <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{{ $title }}</h1>
+            <h1 class="text-[28px] font-semibold tracking-[-0.03em] text-[#042C53] sm:text-[32px]">{{ $title }}</h1>
             @if ($description)
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{{ $description }}</p>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">{{ $description }}</p>
             @endif
         </div>
     </div>
 
     @if (isset($actions))
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3 no-print">
             {{ $actions }}
         </div>
     @endif

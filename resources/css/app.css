@@ -1,10 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+    :root {
+        --gb-navy: #042c53;
+        --gb-primary: #185fa5;
+        --gb-accent: #378add;
+        --gb-page: #f7f8fa;
+        --gb-card: #ffffff;
+        --gb-border: #e5e7eb;
+        --gb-muted: #6b7280;
+        --gb-text: #122033;
+        --gb-radius-card: 12px;
+        --gb-radius-control: 9px;
+        --gb-shadow-card: 0 10px 28px rgba(4, 44, 83, 0.06);
+        --gb-shadow-hover: 0 18px 36px rgba(4, 44, 83, 0.12);
+    }
+
+    html {
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
     body {
-        @apply bg-slate-100 text-slate-800 antialiased;
+        @apply antialiased;
+        background: var(--gb-page);
+        color: var(--gb-text);
     }
 
     [x-cloak] {
@@ -14,37 +37,83 @@
 
 @layer components {
     .app-shell {
-        @apply min-h-screen bg-[radial-gradient(circle_at_top,_rgba(30,64,175,0.08),_transparent_30%),linear-gradient(180deg,_#f8fbff_0%,_#eef3f8_48%,_#f8fafc_100%)];
+        min-height: 100vh;
+        background:
+            radial-gradient(circle at top right, rgba(55, 138, 221, 0.08), transparent 28%),
+            linear-gradient(180deg, #fbfcfd 0%, var(--gb-page) 34%, #f3f5f8 100%);
+    }
+
+    .app-content {
+        animation: ui-fade-in 0.35s ease-out;
     }
 
     .ui-card {
-        @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.35)];
+        @apply border bg-white;
+        border-color: var(--gb-border);
+        border-radius: var(--gb-radius-card);
+        box-shadow: var(--gb-shadow-card);
     }
 
     .ui-card-muted {
-        @apply rounded-2xl border border-slate-200/70 bg-slate-50/80;
+        @apply border bg-white/70;
+        border-color: var(--gb-border);
+        border-radius: var(--gb-radius-card);
+    }
+
+    .ui-sidebar-panel {
+        @apply border-r bg-white;
+        border-color: var(--gb-border);
     }
 
     .ui-section-title {
-        @apply text-sm font-semibold uppercase tracking-[0.18em] text-slate-500;
+        @apply text-[11px] font-semibold uppercase;
+        letter-spacing: 0.18em;
+        color: var(--gb-primary);
     }
 
     .ui-input,
     .ui-select,
     .ui-textarea {
-        @apply mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100;
+        @apply w-full border bg-white px-3 py-2 text-sm shadow-sm outline-none transition;
+        border-color: #d7dce3;
+        border-radius: var(--gb-radius-control);
+        color: var(--gb-text);
+    }
+
+    .ui-input::placeholder,
+    .ui-textarea::placeholder {
+        color: #97a3b6;
+    }
+
+    .ui-input:focus,
+    .ui-select:focus,
+    .ui-textarea:focus {
+        border-color: var(--gb-accent);
+        box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.12);
     }
 
     .ui-textarea {
-        @apply min-h-[96px];
+        min-height: 110px;
     }
 
     .ui-label {
-        @apply text-xs font-semibold uppercase tracking-[0.16em] text-slate-500;
+        @apply mb-1.5 block text-[11px] font-semibold uppercase;
+        letter-spacing: 0.14em;
+        color: #5f6b7a;
     }
 
     .ui-error {
         @apply mt-1 text-xs font-medium text-rose-600;
+    }
+
+    .ui-link {
+        @apply font-medium transition;
+        color: var(--gb-primary);
+    }
+
+    .ui-link:hover {
+        color: var(--gb-navy);
+        text-decoration: underline;
     }
 
     .ui-table-wrap {
@@ -52,31 +121,34 @@
     }
 
     .ui-table {
-        @apply min-w-full text-sm;
+        @apply min-w-full;
+        font-size: 13px;
     }
 
     .ui-table thead {
-        @apply bg-slate-50/90 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
     }
 
     .ui-table th {
-        @apply px-4 py-3;
+        @apply px-4 py-3 text-left;
     }
 
     .ui-table td {
         @apply px-4 py-3 align-top;
+        color: #213042;
     }
 
     .ui-table tbody tr {
-        @apply border-t border-slate-200/80;
+        border-top: 1px solid var(--gb-border);
     }
 
     .ui-table tbody tr:hover {
-        @apply bg-slate-50/70;
-    }
-
-    .ui-link {
-        @apply font-medium text-blue-700 transition hover:text-blue-900 hover:underline;
+        background: rgba(55, 138, 221, 0.035);
     }
 
     .ui-meta-grid {
@@ -84,14 +156,95 @@
     }
 
     .ui-meta-item {
-        @apply rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3;
+        @apply border bg-white px-4 py-3;
+        border-color: var(--gb-border);
+        border-radius: var(--gb-radius-card);
     }
 
     .ui-meta-item dt {
-        @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500;
+        @apply text-[11px] font-semibold uppercase;
+        letter-spacing: 0.14em;
+        color: #6b7280;
     }
 
     .ui-meta-item dd {
-        @apply mt-2 text-sm font-medium text-slate-800;
+        @apply mt-2 text-sm font-medium;
+        color: var(--gb-text);
+    }
+
+    .ui-kpi-hover {
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .ui-kpi-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--gb-shadow-hover);
+    }
+
+    .ui-subtle-grid {
+        background-image:
+            linear-gradient(to right, rgba(4, 44, 83, 0.035) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(4, 44, 83, 0.035) 1px, transparent 1px);
+        background-size: 28px 28px;
+    }
+}
+
+@layer utilities {
+    .text-bb-navy {
+        color: var(--gb-navy);
+    }
+
+    .text-bb-primary {
+        color: var(--gb-primary);
+    }
+
+    .text-bb-accent {
+        color: var(--gb-accent);
+    }
+
+    .bg-bb-page {
+        background-color: var(--gb-page);
+    }
+
+    .bg-bb-navy {
+        background-color: var(--gb-navy);
+    }
+}
+
+@media print {
+    body {
+        background: #fff !important;
+    }
+
+    aside,
+    header,
+    form,
+    button,
+    .no-print {
+        display: none !important;
+    }
+
+    main,
+    .ui-card,
+    .ui-card-muted {
+        box-shadow: none !important;
+        border-color: #d1d5db !important;
+        background: #fff !important;
+    }
+
+    .app-content {
+        animation: none !important;
+    }
+}
+
+@keyframes ui-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
