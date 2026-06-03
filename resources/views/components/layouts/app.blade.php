@@ -13,20 +13,25 @@
 <body class="app-shell" x-data="{ sidebarOpen: false }">
 @php
     $user = auth()->user();
+    $salesPerformanceHref = $user && $user->hasRole('sales')
+        ? route('sales.performance', $user)
+        : route('sales.index');
     $menuItems = [
-        ['label' => 'Dashboard', 'route' => 'dashboard', 'permissions' => ['dashboard.view'], 'icon' => 'DB'],
+        ['label' => 'Dashboard', 'route' => 'dashboard', 'permissions' => ['dashboard.view'], 'icon' => 'DB', 'patterns' => ['dashboard']],
         ['label' => 'Search', 'route' => 'search.index', 'permissions' => ['clients.view', 'vehicles.view', 'drivers.view', 'bookings.view', 'invoices.view', 'maintenance.view', 'meeting-logs.view'], 'icon' => 'SR'],
         ['label' => 'Activity', 'route' => 'activity.index', 'permissions' => ['clients.view', 'bookings.view', 'invoices.view', 'payments.view', 'maintenance.view', 'meeting-logs.view'], 'icon' => 'AC'],
-        ['label' => 'CRM', 'route' => 'crm.index', 'permissions' => ['clients.view', 'meeting-logs.view'], 'icon' => 'CR'],
-        ['label' => 'Fleet', 'route' => 'fleet.index', 'permissions' => ['vehicles.view'], 'icon' => 'FL'],
-        ['label' => 'Drivers', 'route' => 'drivers.index', 'permissions' => ['drivers.view'], 'icon' => 'DR'],
-        ['label' => 'Bookings', 'route' => 'bookings.index', 'permissions' => ['bookings.view'], 'icon' => 'BK'],
-        ['label' => 'Pool Queue', 'route' => 'pool.queue', 'permissions' => ['pool.view-all', 'pool.view-own'], 'icon' => 'PQ'],
-        ['label' => 'Finance', 'route' => 'finance.index', 'permissions' => ['purchase-orders.view', 'invoices.view', 'payments.view', 'evouchers.view'], 'icon' => 'FN'],
+        ['label' => 'CRM', 'route' => 'crm.index', 'permissions' => ['clients.view', 'meeting-logs.view'], 'icon' => 'CR', 'patterns' => ['crm.*']],
+        ['label' => 'Fleet', 'route' => 'fleet.index', 'permissions' => ['vehicles.view'], 'icon' => 'FL', 'patterns' => ['fleet.*']],
+        ['label' => 'Drivers', 'route' => 'drivers.index', 'permissions' => ['drivers.view'], 'icon' => 'DR', 'patterns' => ['drivers.*']],
+        ['label' => 'Sales', 'route' => 'sales.index', 'permissions' => ['dashboard.view'], 'roles' => ['super-admin', 'gm', 'sales-manager', 'sales'], 'icon' => 'SL', 'patterns' => ['sales.*']],
+        ['label' => 'Sales Performance', 'route' => 'sales.index', 'href' => $salesPerformanceHref, 'permissions' => ['dashboard.view'], 'roles' => ['super-admin', 'gm', 'sales-manager', 'sales'], 'icon' => 'SP', 'patterns' => ['sales.performance']],
+        ['label' => 'Bookings', 'route' => 'bookings.index', 'permissions' => ['bookings.view'], 'icon' => 'BK', 'patterns' => ['bookings.*']],
+        ['label' => 'Pool Queue', 'route' => 'pool.queue', 'permissions' => ['pool.view-all', 'pool.view-own'], 'icon' => 'PQ', 'patterns' => ['pool.*']],
+        ['label' => 'Finance', 'route' => 'finance.index', 'permissions' => ['purchase-orders.view', 'invoices.view', 'payments.view', 'evouchers.view'], 'icon' => 'FN', 'patterns' => ['finance.*']],
         ['label' => 'Purchase Orders', 'route' => 'finance.purchase-orders.index', 'permissions' => ['purchase-orders.view'], 'icon' => 'PO'],
         ['label' => 'Invoices', 'route' => 'finance.invoices.index', 'permissions' => ['invoices.view'], 'icon' => 'IV'],
         ['label' => 'E-Vouchers', 'route' => 'finance.e-vouchers.index', 'permissions' => ['evouchers.view'], 'icon' => 'EV'],
-        ['label' => 'Maintenance', 'route' => 'maintenance.index', 'permissions' => ['maintenance.view'], 'icon' => 'MT'],
+        ['label' => 'Maintenance', 'route' => 'maintenance.index', 'permissions' => ['maintenance.view'], 'icon' => 'MT', 'patterns' => ['maintenance.*']],
         ['label' => 'Reports', 'route' => 'reports.index', 'permissions' => ['reports.view'], 'icon' => 'RP'],
         ['label' => 'HR Backend', 'route' => 'admin.hr.drivers', 'permissions' => ['admin.access', 'hr.view'], 'all_required' => true, 'icon' => 'HR'],
     ];
@@ -61,15 +66,19 @@
                     $canView = false;
                     if ($user) {
                         $allRequired = $item['all_required'] ?? false;
-                        $canView = $allRequired
+                        $permissionAllowed = $allRequired
                             ? collect($item['permissions'])->every(fn (string $permission): bool => $user->can($permission))
                             : collect($item['permissions'])->contains(fn (string $permission): bool => $user->can($permission));
+                        $roleAllowed = empty($item['roles'] ?? [])
+                            || collect($item['roles'])->contains(fn (string $role): bool => $user->hasRole($role));
+                        $canView = $permissionAllowed && $roleAllowed;
                     }
-                    $active = request()->routeIs($item['route']) || request()->routeIs($item['route'].'.*');
+                    $patterns = $item['patterns'] ?? [$item['route'], $item['route'].'.*'];
+                    $active = collect($patterns)->contains(fn (string $pattern): bool => request()->routeIs($pattern));
                 @endphp
                 @if ($canView)
-                    <a href="{{ route($item['route']) }}" class="group flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-[13px] font-medium transition {{ $active ? 'bg-[#042C53] text-white shadow-[0_10px_24px_rgba(4,44,83,0.15)]' : 'text-slate-600 hover:bg-[#EEF4FA] hover:text-[#042C53]' }}">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-[9px] border text-[10px] font-semibold {{ $active ? 'border-white/15 bg-white/10 text-white' : 'border-[#E5E7EB] bg-white text-[#185FA5] group-hover:border-[#D3E3F6]' }}">{{ $item['icon'] }}</span>
+                    <a href="{{ $item['href'] ?? route($item['route']) }}" class="group flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-[13px] transition {{ $active ? 'ui-sidebar-active' : 'font-medium text-slate-600 hover:bg-[#EEF4FA] hover:text-[#042C53]' }}">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-[9px] border text-[10px] font-semibold {{ $active ? 'border-white/20 bg-white/14 text-white shadow-inner' : 'border-[#E5E7EB] bg-white text-[#185FA5] group-hover:border-[#D3E3F6]' }}">{{ $item['icon'] }}</span>
                         <span class="truncate">{{ $item['label'] }}</span>
                     </a>
                 @endif
@@ -123,7 +132,7 @@
         </header>
 
         <main class="app-content flex-1">
-            <div class="mx-auto w-full max-w-[1440px] space-y-5 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            <div class="mx-auto w-full max-w-[1440px] space-y-4 px-4 py-4 sm:px-5 lg:px-7 lg:py-5">
                 @if (session('success'))
                     <div class="rounded-[12px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
                         {{ session('success') }}

@@ -65,6 +65,22 @@
         border-color: var(--gb-border);
     }
 
+    .ui-sidebar-active {
+        @apply font-semibold text-white;
+        background: linear-gradient(135deg, #042c53 0%, #0b447e 100%);
+        box-shadow: 0 14px 28px rgba(4, 44, 83, 0.18);
+        position: relative;
+    }
+
+    .ui-sidebar-active::before {
+        content: '';
+        position: absolute;
+        inset: 8px auto 8px 0;
+        width: 4px;
+        border-radius: 999px;
+        background: #9fccf5;
+    }
+
     .ui-section-title {
         @apply text-[11px] font-semibold uppercase;
         letter-spacing: 0.18em;
@@ -192,6 +208,25 @@
     .ui-kpi-hover:hover {
         transform: translateY(-3px);
         box-shadow: var(--gb-shadow-hover);
+    }
+
+    .ui-compact-grid {
+        @apply grid gap-3;
+    }
+
+    .ui-compact-card {
+        @apply px-3 py-3;
+    }
+
+    .ui-dashboard-card {
+        @apply border bg-white;
+        border-color: var(--gb-border);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(4, 44, 83, 0.05);
+    }
+
+    .ui-kpi-caption {
+        @apply mt-1 text-[11px] leading-5 text-slate-500;
     }
 
     .ui-subtle-grid {

@@ -12,29 +12,29 @@
 @endphp
 
 @if ($href)
-    <a href="{{ $href }}" {{ $attributes->class(['ui-card ui-kpi-hover group block overflow-hidden']) }}>
+    <a href="{{ $href }}" title="{{ $hint }}" {{ $attributes->class(['ui-dashboard-card ui-kpi-hover group block overflow-hidden']) }}>
         <div class="h-1 {{ $scheme['line'] }}"></div>
-        <div class="p-4">
+        <div class="ui-compact-card">
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{{ $label }}</p>
-                    <p class="mt-3 text-[30px] font-semibold tracking-[-0.04em] text-[#042C53]">{{ $value }}</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{{ $label }}</p>
+                    <p class="mt-2 text-[24px] font-semibold tracking-[-0.04em] text-[#042C53] xl:text-[26px]">{{ $value }}</p>
+                    @if ($hint)
+                        <p class="ui-kpi-caption line-clamp-1">{{ $hint }}</p>
+                    @endif
                 </div>
-                <span class="rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] transition {{ $scheme['pill'] }}">{{ $linkLabel }}</span>
+                <span class="rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] transition {{ $scheme['pill'] }}">{{ $linkLabel }}</span>
             </div>
-            @if ($hint)
-                <p class="mt-2 text-sm leading-5 text-slate-500">{{ $hint }}</p>
-            @endif
         </div>
     </a>
 @else
-    <div {{ $attributes->class(['ui-card overflow-hidden']) }}>
+    <div title="{{ $hint }}" {{ $attributes->class(['ui-dashboard-card overflow-hidden']) }}>
         <div class="h-1 {{ $scheme['line'] }}"></div>
-        <div class="p-4">
-            <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{{ $label }}</p>
-            <p class="mt-3 text-[30px] font-semibold tracking-[-0.04em] text-[#042C53]">{{ $value }}</p>
+        <div class="ui-compact-card">
+            <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{{ $label }}</p>
+            <p class="mt-2 text-[24px] font-semibold tracking-[-0.04em] text-[#042C53] xl:text-[26px]">{{ $value }}</p>
             @if ($hint)
-                <p class="mt-2 text-sm leading-5 text-slate-500">{{ $hint }}</p>
+                <p class="ui-kpi-caption line-clamp-1">{{ $hint }}</p>
             @endif
         </div>
     </div>

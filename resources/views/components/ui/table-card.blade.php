@@ -2,14 +2,14 @@
 
 <section {{ $attributes->class(['ui-card overflow-hidden']) }}>
     @if ($title || $description || isset($actions))
-        <div class="border-b border-[#E5E7EB] px-5 py-4">
+        <div class="border-b border-[#E5E7EB] px-4 py-3">
             <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     @if ($title)
-                        <h3 class="text-[15px] font-semibold text-[#042C53]">{{ $title }}</h3>
+                        <h3 class="text-[14px] font-semibold text-[#042C53]">{{ $title }}</h3>
                     @endif
                     @if ($description)
-                        <p class="mt-1 text-sm text-slate-500">{{ $description }}</p>
+                        <p class="mt-1 text-[13px] text-slate-500">{{ $description }}</p>
                     @endif
                 </div>
                 @if (isset($actions))

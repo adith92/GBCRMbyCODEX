@@ -6,6 +6,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\MeetingLogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VehicleController;
 use App\Livewire\Admin\Hr\Attendance as HrAttendance;
@@ -46,6 +47,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/search', SearchController::class)->name('search.index');
     Route::get('/activity', ActivityController::class)->name('activity.index');
+    Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+    Route::get('/sales/{user}/performance', [SalesController::class, 'performance'])->name('sales.performance');
 
     Route::prefix('/crm')->name('crm.')->group(function (): void {
         Route::get('/', fn () => redirect()->route('crm.clients.index'))
