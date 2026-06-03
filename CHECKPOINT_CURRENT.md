@@ -77,6 +77,9 @@
 - Added a final handoff/review document consolidating live URL, demo accounts, validation, smoke-test result, and recommended review flow.
 - Synchronized README, changelog, and summary documentation to the final phase 7 state.
 - Closed the practical MVP demo roadmap for the current version.
+- Added GitHub CI readiness work:
+  - stable `package.json` package name to prevent local `package-lock.json` drift
+  - GitHub Actions workflow for install, build, migrate, seed, and full test execution
 
 ## Validation Result
 

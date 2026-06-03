@@ -7,6 +7,7 @@ Semua perubahan penting di repo ini dicatat di file ini.
 - Menambahkan `docs/FINAL_DEMO_REVIEW_PACK.md` sebagai ringkasan handoff final.
 - Menyelaraskan README, checkpoint, dan summary docs ke status final phase 7.
 - Menutup roadmap praktis demo-ready + deploy-ready untuk versi saat ini.
+- Menyiapkan GitHub Actions CI dasar dan menstabilkan metadata `package.json` agar `package-lock.json` tidak drift karena nama folder clone lokal.
 
 ## [7.2] - 2026-06-03
 

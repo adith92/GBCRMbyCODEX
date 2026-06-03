@@ -6,6 +6,7 @@
 ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Spatie Permission](https://img.shields.io/badge/Spatie-Permission-1F2937?style=for-the-badge)
 ![Built by Codex](https://img.shields.io/badge/Built%20By-CODEX-111827?style=for-the-badge)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%20Ready-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
 > Sistem CRM, Fleet, Pool Dispatch, Finance, Maintenance, dan HR backend-only untuk kebutuhan demo operasional B2B.  
 > Dibangun oleh **CODEX** dengan stack **Laravel 12 + Livewire 3 + MySQL + Tailwind + Spatie Permission**. ✨
@@ -216,6 +217,27 @@ When stress mode is enabled and `DEMO_CUSTOMER_COUNT` is empty, the seeder defau
 ### Deployment Docs
 
 - Detailed guide: [docs/RAILWAY_DEPLOYMENT.md](./docs/RAILWAY_DEPLOYMENT.md)
+
+## GitHub CI/CD 🔁
+
+Repo ini sekarang sudah disiapkan untuk GitHub Actions CI dasar melalui:
+
+- `.github/workflows/ci.yml`
+
+Workflow tersebut menjalankan:
+
+- `composer install`
+- `npm install`
+- `php artisan optimize:clear`
+- `php artisan migrate:fresh --seed`
+- `npm run build`
+- `php artisan test`
+
+Catatan penting:
+
+- test workflow memakai `sqlite` untuk environment CI
+- `package.json` sekarang punya field `name=gbcrmbycodex` supaya `package-lock.json` tidak berubah hanya karena nama folder clone lokal berbeda
+- ini menghilangkan drift lockfile lokal seperti yang sebelumnya muncul saat repo di-clone ke folder bernama berbeda
 
 ## 🧾 Build Summary
 
