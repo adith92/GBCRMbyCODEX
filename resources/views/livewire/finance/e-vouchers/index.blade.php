@@ -19,7 +19,12 @@
         @if($vouchers->count()===0)
             <div class="p-5"><x-ui.empty-state title="No vouchers found" description="Create a voucher to support finance demo scenarios that use non-cash settlement." /></div>
         @else
-            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>Code</th><th>Client</th><th>Status</th><th>Amount</th><th class="text-right">Action</th></tr></thead><tbody>@foreach($vouchers as $voucher)<tr><td><p class="font-semibold text-slate-900">{{ $voucher->code }}</p></td><td>{{ $voucher->client?->name ?? 'General' }}</td><td><x-ui.status-badge :status="$voucher->status" /></td><td>{{ number_format($voucher->amount,2) }}</td><td class="text-right"><a class="ui-link" href="{{ route('finance.e-vouchers.show',$voucher) }}">Open Detail</a></td></tr>@endforeach</tbody></table></div>
+            <div class="ui-table-wrap"><table class="ui-table"><thead><tr>
+                <th><button type="button" wire:click="sort('code')" class="ui-sort-link {{ $sortBy === 'code' ? 'is-active' : '' }}">Code @if($sortBy==='code')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('client_name')" class="ui-sort-link {{ $sortBy === 'client_name' ? 'is-active' : '' }}">Client @if($sortBy==='client_name')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('status')" class="ui-sort-link {{ $sortBy === 'status' ? 'is-active' : '' }}">Status @if($sortBy==='status')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('amount')" class="ui-sort-link {{ $sortBy === 'amount' ? 'is-active' : '' }}">Amount @if($sortBy==='amount')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+            </tr></thead><tbody>@foreach($vouchers as $voucher)<tr><td><a class="ui-link font-semibold text-slate-900" href="{{ route('finance.e-vouchers.show',$voucher) }}">{{ $voucher->code }}</a></td><td>@if($voucher->client)<a class="ui-link" href="{{ route('crm.clients.show', $voucher->client) }}">{{ $voucher->client->name }}</a>@else General @endif</td><td><a href="{{ route('finance.e-vouchers.index', ['status' => $voucher->status]) }}"><x-ui.status-badge :status="$voucher->status" /></a></td><td>{{ number_format($voucher->amount,2) }}</td></tr>@endforeach</tbody></table></div>
             <div class="border-t border-slate-200/80 px-4 py-4">{{ $vouchers->links() }}</div>
         @endif
     </x-ui.table-card>

@@ -26,7 +26,12 @@
         @if($purchaseOrders->count()===0)
             <div class="p-5"><x-ui.empty-state title="No purchase orders found" description="Create a PO from a confirmed booking to start the finance document chain." /></div>
         @else
-            <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th>PO</th><th>Client</th><th>Status</th><th>Total</th><th class="text-right">Action</th></tr></thead><tbody>@foreach($purchaseOrders as $po)<tr><td><p class="font-semibold text-slate-900">{{ $po->po_number }}</p></td><td>@if($po->client)<a class="ui-link" href="{{ route('crm.clients.show', $po->client) }}">{{ $po->client->name }}</a>@else - @endif</td><td><x-ui.status-badge :status="$po->status" /></td><td>{{ number_format($po->total,2) }}</td><td class="text-right"><a class="ui-link" href="{{ route('finance.purchase-orders.show',$po) }}">Open Detail</a></td></tr>@endforeach</tbody></table></div>
+            <div class="ui-table-wrap"><table class="ui-table"><thead><tr>
+                <th><button type="button" wire:click="sort('po_number')" class="ui-sort-link {{ $sortBy === 'po_number' ? 'is-active' : '' }}">PO @if($sortBy==='po_number')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('client_name')" class="ui-sort-link {{ $sortBy === 'client_name' ? 'is-active' : '' }}">Client @if($sortBy==='client_name')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('status')" class="ui-sort-link {{ $sortBy === 'status' ? 'is-active' : '' }}">Status @if($sortBy==='status')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                <th><button type="button" wire:click="sort('total')" class="ui-sort-link {{ $sortBy === 'total' ? 'is-active' : '' }}">Total @if($sortBy==='total')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+            </tr></thead><tbody>@foreach($purchaseOrders as $po)<tr><td><a class="ui-link font-semibold text-slate-900" href="{{ route('finance.purchase-orders.show',$po) }}">{{ $po->po_number }}</a></td><td>@if($po->client)<a class="ui-link" href="{{ route('crm.clients.show', $po->client) }}">{{ $po->client->name }}</a>@else - @endif</td><td><a href="{{ route('finance.purchase-orders.index', ['status' => $po->status]) }}"><x-ui.status-badge :status="$po->status" /></a></td><td>{{ number_format($po->total,2) }}</td></tr>@endforeach</tbody></table></div>
             <div class="border-t border-slate-200/80 px-4 py-4">{{ $purchaseOrders->links() }}</div>
         @endif
     </x-ui.table-card>

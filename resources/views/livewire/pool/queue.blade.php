@@ -36,20 +36,19 @@
                 <table class="ui-table">
                     <thead>
                     <tr>
-                        <th>Booking</th>
-                        <th>Client</th>
-                        <th>Pool</th>
-                        <th>Schedule</th>
+                        <th><button type="button" wire:click="sort('booking_number')" class="ui-sort-link {{ $sortBy === 'booking_number' ? 'is-active' : '' }}">Booking @if($sortBy==='booking_number')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                        <th><button type="button" wire:click="sort('client_name')" class="ui-sort-link {{ $sortBy === 'client_name' ? 'is-active' : '' }}">Client @if($sortBy==='client_name')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                        <th><button type="button" wire:click="sort('pool_name')" class="ui-sort-link {{ $sortBy === 'pool_name' ? 'is-active' : '' }}">Pool @if($sortBy==='pool_name')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                        <th><button type="button" wire:click="sort('start_datetime')" class="ui-sort-link {{ $sortBy === 'start_datetime' ? 'is-active' : '' }}">Schedule @if($sortBy==='start_datetime')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
                         <th>Current Assignment</th>
-                        <th class="text-right">Action</th>
+                        <th><button type="button" wire:click="sort('status')" class="ui-sort-link {{ $sortBy === 'status' ? 'is-active' : '' }}">Status @if($sortBy==='status')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach ($bookings as $booking)
                         <tr>
                             <td>
-                                <p class="font-semibold text-slate-900">{{ $booking->booking_number }}</p>
-                                <div class="mt-2"><x-ui.status-badge :status="$booking->status" /></div>
+                                <a href="{{ route('bookings.show', $booking) }}" class="ui-link font-semibold text-slate-900">{{ $booking->booking_number }}</a>
                             </td>
                             <td>
                                 @if ($booking->client)
@@ -58,17 +57,19 @@
                                     -
                                 @endif
                             </td>
-                            <td>{{ $booking->pool?->name ?? '-' }}</td>
+                            <td>@if($booking->pool)<a href="{{ route('pool.queue', ['pool' => $booking->pool->id]) }}" class="ui-link">{{ $booking->pool->name }}</a>@else - @endif</td>
                             <td>{{ $booking->start_datetime?->format('Y-m-d H:i') }}<br><span class="text-xs text-slate-500">to {{ $booking->end_datetime?->format('Y-m-d H:i') }}</span></td>
                             <td>
-                                <p><span class="text-xs uppercase tracking-[0.14em] text-slate-500">Vehicle</span><br>{{ $booking->vehicle?->plate_number ?? '-' }}</p>
-                                <p class="mt-2"><span class="text-xs uppercase tracking-[0.14em] text-slate-500">Driver</span><br>{{ $booking->driver?->name ?? '-' }}</p>
+                                <p><span class="text-xs uppercase tracking-[0.14em] text-slate-500">Vehicle</span><br>@if($booking->vehicle)<a href="{{ route('fleet.vehicles.show', $booking->vehicle) }}" class="ui-link">{{ $booking->vehicle->plate_number }}</a>@else - @endif</p>
+                                <p class="mt-2"><span class="text-xs uppercase tracking-[0.14em] text-slate-500">Driver</span><br>@if($booking->driver)<a href="{{ route('drivers.show', $booking->driver) }}" class="ui-link">{{ $booking->driver->name }}</a>@else - @endif</p>
                             </td>
-                            <td class="text-right">
-                                <a href="{{ route('bookings.show', $booking) }}" class="ui-link mr-3">Detail</a>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('pool.queue', ['status' => $booking->status]) }}"><x-ui.status-badge :status="$booking->status" /></a>
                                 @can('pool.assign-driver')
                                     <x-ui.action-button :href="route('pool.assign', $booking)" variant="secondary">Assign</x-ui.action-button>
                                 @endcan
+                                </div>
                             </td>
                         </tr>
                     @endforeach

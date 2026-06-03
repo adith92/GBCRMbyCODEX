@@ -36,21 +36,19 @@
                 <table class="ui-table">
                     <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Vehicle</th>
-                        <th>Status</th>
-                        <th>Cost</th>
-                        <th class="text-right">Action</th>
+                        <th><button type="button" wire:click="sort('title')" class="ui-sort-link {{ $sortBy === 'title' ? 'is-active' : '' }}">Title @if($sortBy==='title')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                        <th><button type="button" wire:click="sort('vehicle_name')" class="ui-sort-link {{ $sortBy === 'vehicle_name' ? 'is-active' : '' }}">Vehicle @if($sortBy==='vehicle_name')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                        <th><button type="button" wire:click="sort('status')" class="ui-sort-link {{ $sortBy === 'status' ? 'is-active' : '' }}">Status @if($sortBy==='status')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
+                        <th><button type="button" wire:click="sort('cost')" class="ui-sort-link {{ $sortBy === 'cost' ? 'is-active' : '' }}">Cost @if($sortBy==='cost')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif</button></th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($maintenanceLogs as $log)
                         <tr>
-                            <td>{{ $log->title }}</td>
-                            <td>{{ $log->vehicle?->plate_number }}</td>
-                            <td><x-ui.status-badge :status="$log->status" /></td>
+                            <td><a class="ui-link font-semibold text-slate-900" href="{{ route('maintenance.show', $log) }}">{{ $log->title }}</a></td>
+                            <td>@if($log->vehicle)<a href="{{ route('fleet.vehicles.show', $log->vehicle) }}" class="ui-link">{{ $log->vehicle->plate_number }}</a>@else - @endif</td>
+                            <td><a href="{{ route('maintenance.index', ['status' => $log->status]) }}"><x-ui.status-badge :status="$log->status" /></a></td>
                             <td>{{ number_format($log->cost, 2) }}</td>
-                            <td class="text-right"><a class="ui-link" href="{{ route('maintenance.show', $log) }}">Open Detail</a></td>
                         </tr>
                     @endforeach
                     </tbody>
