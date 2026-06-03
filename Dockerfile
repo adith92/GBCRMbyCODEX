@@ -23,11 +23,11 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-RUN npm ci && npm run build
-
-RUN mkdir -p database storage bootstrap/cache \
+RUN mkdir -p database storage/framework/cache/data storage/framework/sessions storage/framework/views bootstrap/cache \
     && touch database/database.sqlite \
     && chmod -R 775 storage bootstrap/cache database
+
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN npm ci && npm run build
 
 CMD ["sh", "-lc", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force && if [ \"$ENABLE_DEMO_SEED\" = \"true\" ]; then php artisan db:seed --force; fi && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"]
